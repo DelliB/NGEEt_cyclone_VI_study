@@ -59,14 +59,23 @@ ggsave("NDVI1_NDVI2.png", width = 5, height = 5, path = data_directory)
 # TL post and NDVI post
 
 
-# TL change and NDVI1 and 2
+# TL change and NDVI1
 
 
-# LL pre and NDVI1 and 2 pre
+# TL change and NDVI2
+
+
+# LL pre and NDVI1 pre
+
+
+# LL pre and NDVI2 pre
 
 
 # LL post and NDVI post
 
 
-# LL change and NDVI1 and 2
+# LL change and NDVI1
+
+
+# LL change and NDVI2
 
