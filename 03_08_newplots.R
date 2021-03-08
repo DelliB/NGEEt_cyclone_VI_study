@@ -14,6 +14,9 @@ data_directory <- '~/Documents/Kueppers lab'
 NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), stringsAsFactors = FALSE)
 
 # data transformations
+NDVInodry <- NDVI[which(NDVI$Broad.Life.Zone != "Dry"),]
+NDVIdry <- NDVI[which(NDVI$Broad.Life.Zone == "Dry"),]
+
 # standardize change in litterfall
 NDVI$TL_change_1 <- scale(NDVI$TL_change_1)
 NDVI$LL_change_1 <- scale(NDVI$LL_change_1)
@@ -21,6 +24,7 @@ NDVI$TL_change_2 <- scale(NDVI$TL_change_2)
 NDVI$LL_change_2 <- scale(NDVI$LL_change_2)
 # ordering HLZ classifications
 NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
+x = expression(paste(log[10],"(soil phosphorus (mg/kg))"))
 
 # Tukey
 generate_label_df <- function(TUKEY, variable){
@@ -43,7 +47,7 @@ pairwise.wilcox.test(NDVI$NDVI2, NDVI$Holdridge,
                      p.adjust.method = "BH")
 
 # checking for residuals
-Model <- lm(NDVI2~soil.P, NDVI)
+Model <- lm(NDVI2_pre~soil.P, NDVInodry)
 shapiro.test(residuals(Model))
 
 # plots
@@ -171,7 +175,6 @@ ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI2)) +
 ggsave("NDVI2_broad_Holdridge_box.png", width = 6, height = 5, path = data_directory)
 
 # NDVI1 and log transformed soil P
-x = expression(paste(log[10],"(soil phosphorus (mg/kg))"))
 ggplot(NDVI, aes(x = log(soil.P), y = NDVI1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
@@ -207,3 +210,106 @@ ggplot(NDVI, aes(x = soil.P, y = NDVI2)) +
         panel.grid.minor = element_blank())
 ggsave("NDVI2_soilP.png", width = 5, height = 5, path = data_directory)
 
+# pre-NDVI1 and soil P with log transformation
+ggplot(NDVI, aes(x = log(soil.P), y = NDVI1_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = x, y = "Non-seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("pre_NDVI1_soilP_log.png", width = 5, height = 5, path = data_directory)
+
+# pre-NDVI2 and soil P with log transformation
+ggplot(NDVI, aes(x = log(soil.P), y = NDVI2_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = x, y = "Seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("pre_NDVI2_soilP_log.png", width = 5, height = 5, path = data_directory)
+
+# only dry forest pre-NDVI1 and soil P
+ggplot(NDVIdry, aes(x = soil.P, y = NDVI1_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(title = "only dry forests included", x = "Soil Phosphorus (mg/kg)", y = "Non-seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("dry_pre_NDVI1_soilP.png", width = 5, height = 5, path = data_directory)
+
+# only dry forest pre-NDVI2 and soil P
+ggplot(NDVIdry, aes(x = soil.P, y = NDVI2_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(title = "only dry forests included", x = "Soil Phosphorus (mg/kg)", y = "Seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("dry_pre_NDVI2_soilP.png", width = 5, height = 5, path = data_directory)
+
+# without dry forest pre-NDVI1 and soil P
+ggplot(NDVInodry, aes(x = soil.P, y = NDVI1_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(title = "dry forests excluded", x = "Soil Phosphorus (mg/kg)", y = "Non-seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("nodry_pre_NDVI1_soilP.png", width = 5, height = 5, path = data_directory)
+
+# without dry forest pre-NDVI2 and soil P with log transformation
+ggplot(NDVInodry, aes(x = log(soil.P), y = NDVI2_pre)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(title = "dry forests excluded", x = x, y = "Seasonal pre-cyclone NDVI") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("nodry_pre_NDVI2_soilP_log.png", width = 5, height = 5, path = data_directory)
