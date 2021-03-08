@@ -14,6 +14,12 @@ data_directory <- '~/Documents/Kueppers lab'
 NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), stringsAsFactors = FALSE)
 #NDVI <- read.csv(file = "~/Documents/Kueppers lab/Disturbance_details_NDVI.csv")
 
+# data transformations
+NDVI$TL_change_1 <- scale(NDVI$TL_change_1)
+NDVI$LL_change_1 <- scale(NDVI$LL_change_1)
+NDVI$TL_change_2 <- scale(NDVI$TL_change_2)
+NDVI$LL_change_2 <- scale(NDVI$LL_change_2)
+
 # Tukey
 generate_label_df <- function(TUKEY, variable){
   Tukey.levels <- TUKEY[[variable]][,4]
@@ -108,10 +114,12 @@ ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI2, color = Broad.Life.Zone)) +
 ggsave("NDVI2_WvD_box.png", width = 6, height = 5, path = data_directory)
 
 # soil P and NDVI1
-ggplot(NDVI, aes(x = P_class, y = NDVI1, color = P_class)) +
-  geom_boxplot() +
-  stat_summary(fun=mean, geom="point", size=1) +
-  labs(x = "Soil Phosphorous class", y = "Change in NDVI1") +
+ggplot(NDVI, aes(x = soil.P, y = NDVI1)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in NDVI1") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -121,13 +129,15 @@ ggplot(NDVI, aes(x = P_class, y = NDVI1, color = P_class)) +
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank())
-ggsave("NDVI1_P_box.png", width = 6, height = 5, path = data_directory)
+ggsave("new_NDVI1_P_box.png", width = 6, height = 5, path = data_directory)
 
 # soil P and NDVI2
-ggplot(NDVI, aes(x = P_class, y = NDVI2, color = P_class)) +
-  geom_boxplot() +
-  stat_summary(fun=mean, geom="point", size=1) +
-  labs(x = "Soil Phosphorous class", y = "Change in NDVI2") +
+ggplot(NDVI, aes(x = soil.P, y = NDVI2)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in NDVI2") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -137,5 +147,78 @@ ggplot(NDVI, aes(x = P_class, y = NDVI2, color = P_class)) +
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank())
-ggsave("NDVI2_P_box.png", width = 6, height = 5, path = data_directory)
+ggsave("new_NDVI2_P_box.png", width = 6, height = 5, path = data_directory)
+
+# soil P and TL1
+ggplot(NDVI, aes(x = soil.P, y = TL_change_1)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in non-seasonal Total Litterfall") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("new_TL1_P_box.png", width = 6, height = 5, path = data_directory)
+
+# soil P and LL1
+ggplot(NDVI, aes(x = soil.P, y = LL_change_1)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in non-seasonal Leaf Litterfall") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("new_LL1_P_box.png", width = 6, height = 5, path = data_directory)
+
+# soil P and TL2
+ggplot(NDVI, aes(x = soil.P, y = TL_change_2)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in seasonal Total Litterfall") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("new_TL2_P_box.png", width = 6, height = 5, path = data_directory)
+
+# soil P and LL2
+ggplot(NDVI, aes(x = soil.P, y = LL_change_2)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  labs(x = "Soil Phosphorous (mg/kg)", y = "Change in seasonal Leaf Litterfall") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "none",
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank())
+ggsave("new_LL2_P_box.png", width = 6, height = 5, path = data_directory)
+
 
