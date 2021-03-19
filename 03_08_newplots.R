@@ -6,6 +6,7 @@
 library(tidyverse)
 library(ggpubr)
 library(multcompView)
+library(MASS)
 
 # Dellena file path
 data_directory <- '~/Documents/Kueppers lab'
@@ -25,6 +26,8 @@ NDVI$LL_change_2 <- scale(NDVI$LL_change_2)
 # ordering HLZ classifications
 NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
 x = expression(paste(log[10],"(soil phosphorus (mg/kg))"))
+dNDVI1 = expression(Delta*"NDVI annual")
+dNDVI2 = expression(Delta*"NDVI sub-annual")
 
 # Tukey
 generate_label_df <- function(TUKEY, variable){
@@ -49,6 +52,10 @@ pairwise.wilcox.test(NDVI$NDVI2, NDVI$Holdridge,
 # checking for residuals
 Model <- lm(NDVI2_pre~soil.P, NDVInodry)
 shapiro.test(residuals(Model))
+
+# checking the dependence of soil P on broad forest type
+model <- lm(NDVI1~Broad.Life.Zone * log(soil.P), data = NDVI)
+summary(model)
 
 # plots
 # HLZ histogram
@@ -209,6 +216,56 @@ ggplot(NDVI, aes(x = soil.P, y = NDVI2)) +
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank())
 ggsave("NDVI2_soilP.png", width = 5, height = 5, path = data_directory)
+
+# NDVI1 and log transformed soil P, with color by HLZ
+ggplot(NDVI, aes(x = log(soil.P), y = NDVI1, color = Holdridge)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"), group = 1)) +
+  labs(x = x, y = dNDVI1) +
+  geom_hline(yintercept=c(0), color = "gray") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "right",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9, color = "black"),
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank()) +
+  guides(color = guide_legend(title = "", 
+        override.aes = aes(label = ""))) +
+  annotate("text", x = 7, y = 0.023,
+           label = c("Baseline"))
+ggsave("NDVI1_soilP_log_HLZ2.png", width = 8, height = 5, path = data_directory)
+
+# NDVI2 and log transformed soil P, with color by HLZ
+ggplot(NDVI, aes(x = log(soil.P), y = NDVI2, color = Holdridge)) +
+  geom_point(size = 1) +
+  geom_smooth(method=lm, se=FALSE, fullrange=FALSE) +
+  stat_cor(method = "pearson", size = 4,
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"), group = 1)) +
+  labs(x = x, y = dNDVI2) +
+  geom_hline(yintercept=c(0), color = "gray") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "right",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9, color = "black"),
+        plot.title = element_blank(),
+        axis.ticks.x = element_blank(), 
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank()) +
+  guides(color = guide_legend(title = "", 
+        override.aes = aes(label = ""))) +
+  annotate("text", x = 7, y = 0.023,
+           label = c("Baseline"))
+ggsave("NDVI2_soilP_log_HLZ2.png", width = 8, height = 5, path = data_directory)
 
 # pre-NDVI1 and soil P with log transformation
 ggplot(NDVI, aes(x = log(soil.P), y = NDVI1_pre)) +

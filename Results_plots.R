@@ -19,10 +19,10 @@ NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), 
 #NDVIdry <- NDVI[which(NDVI$Broad.Life.Zone == "Dry"),]
 
 # standardize change in litterfall
-NDVI$TL_change_1 <- scale(NDVI$TL_change_1)
-NDVI$LL_change_1 <- scale(NDVI$LL_change_1)
-NDVI$TL_change_2 <- scale(NDVI$TL_change_2)
-NDVI$LL_change_2 <- scale(NDVI$LL_change_2)
+NDVI$G_TL_1 <- scale(NDVI$TL_change_1)
+NDVI$G_LL_1 <- scale(NDVI$LL_change_1)
+NDVI$G_TL_2 <- scale(NDVI$TL_change_2)
+NDVI$G_LL_2 <- scale(NDVI$LL_change_2)
 
 # ordering HLZ classifications
 NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
@@ -43,6 +43,7 @@ TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+  geom_vline(xintercept=c(0), color = "gray") +
   labs(y = dTL1, x = dNDVI1) +
   theme_bw() +
   theme(panel.background = element_blank(),
@@ -50,14 +51,17 @@ TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
         legend.position = "none",
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank()) +
+  annotate("text", x = -0.115, y = 3,
+           label = c("Baseline"))
 
 TLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_TL_2)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dTL2, x = dNDVI2) +
+  geom_vline(xintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -72,6 +76,7 @@ LLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_LL_1)) +
   stat_cor(method = "pearson", size = 4,
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dLL1, x = dNDVI1) +
+  geom_vline(xintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -86,6 +91,7 @@ LLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_LL_2)) +
   stat_cor(method = "pearson", size = 4,
            aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dLL2, x = dNDVI2) +
+  geom_vline(xintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -99,7 +105,8 @@ LL <- ggarrange(LLNDVI1, LLNDVI2, ncol = 2, labels = c("c", "d"))
 LF_NDVI <- ggarrange(TL, LL, nrow = 2, labels = c("", ""))
 LF_NDVI <- annotate_figure(LF_NDVI, top = text_grob("Litterfall and NDVI spatially grouped", 
                                     color = "black", size = 14))
-#print(LF_NDVI)
+print(LF_NDVI)
+
 ggsave("Results_TL_LL_NDVI.png", width = 6, height = 6, path = data_directory)
 
 # Soil P vs delta NDVI (1 and 2)- 2 total
