@@ -18,21 +18,15 @@ NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), 
 #NDVInodry <- NDVI[which(NDVI$Broad.Life.Zone != "Dry"),]
 #NDVIdry <- NDVI[which(NDVI$Broad.Life.Zone == "Dry"),]
 
-# standardize change in litterfall
-NDVI$G_TL_1 <- scale(NDVI$TL_change_1)
-NDVI$G_LL_1 <- scale(NDVI$LL_change_1)
-NDVI$G_TL_2 <- scale(NDVI$TL_change_2)
-NDVI$G_LL_2 <- scale(NDVI$LL_change_2)
-
 # ordering HLZ classifications
 NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
 
 # axis labels
-x = expression(paste(log[10],"(soil phosphorus (mg/kg))"))
-dTL1 = expression(Delta*"TL annual"~ (g/m^2/day))
-dTL2 = expression(Delta*"TL sub-annual"~ (g/m^2/day))
-dLL1 = expression(Delta*"LL annual"~ (g/m^2/day))
-dLL2 = expression(Delta*"LL sub-annual"~ (g/m^2/day))
+x = expression(paste(log[10],"(Soil Phosphorus (mg/kg))"))
+dTL1 = expression(Delta*"TL annual")
+dTL2 = expression(Delta*"TL sub-annual")
+dLL1 = expression(Delta*"LL annual")
+dLL2 = expression(Delta*"LL sub-annual")
 dNDVI1 = expression(Delta*"NDVI annual")
 dNDVI2 = expression(Delta*"NDVI sub-annual")
 
@@ -42,8 +36,9 @@ TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   geom_vline(xintercept=c(0), color = "gray") +
+  geom_hline(yintercept=c(0), color = "gray") +
   labs(y = dTL1, x = dNDVI1) +
   theme_bw() +
   theme(panel.background = element_blank(),
@@ -52,7 +47,7 @@ TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
         panel.grid.minor = element_blank()) +
-  annotate("text", x = -0.115, y = 3,
+  annotate("text", x = -0.115, y = -40,
            label = c("Baseline"))
 
 TLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_TL_2)) +
@@ -62,6 +57,7 @@ TLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_TL_2)) +
            aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dTL2, x = dNDVI2) +
   geom_vline(xintercept=c(0), color = "gray") +
+  geom_hline(yintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -74,9 +70,10 @@ LLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_LL_1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dLL1, x = dNDVI1) +
-  geom_vline(xintercept=c(0), color = "gray") +
+  geom_vline(xintercept=c(0), color = "gray") +  
+  geom_hline(yintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -89,9 +86,10 @@ LLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_LL_2)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(y = dLL2, x = dNDVI2) +
   geom_vline(xintercept=c(0), color = "gray") +
+  geom_hline(yintercept=c(0), color = "gray") +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -114,7 +112,7 @@ PNDVI1 <- ggplot(NDVI, aes(x = log(soil.P), y = NDVI1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, color = "black") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(x = x, y = dNDVI1) +
   geom_hline(yintercept=c(0), color = "gray") +
   theme_bw() +
@@ -133,7 +131,7 @@ PNDVI2 <- ggplot(NDVI, aes(x = log(soil.P), y = NDVI2)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed", color = "black") +
   stat_cor(method = "pearson", size = 4,
-           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+           aes(label = paste(..r.label.., ..p.label.., sep = "~`,`~"))) +
   labs(x = x, y = dNDVI2) +
   geom_hline(yintercept=c(0), color = "gray") +
   theme_bw() +
