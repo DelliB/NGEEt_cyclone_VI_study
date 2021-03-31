@@ -22,7 +22,7 @@ NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), 
 NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
 
 # axis labels
-x = expression(paste(log[10],"(Soil Phosphorus (mg/kg))"))
+x = expression(paste(log[10],"(soil P (mg/kg))"))
 dTL1 = expression(Delta*"TL annual")
 dTL2 = expression(Delta*"TL sub-annual")
 dLL1 = expression(Delta*"LL annual")
