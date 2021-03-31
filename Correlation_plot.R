@@ -29,7 +29,7 @@ NDVI <- NDVI %>%
 #prepare data frame including the variables of interest
 #check column number for the variables you want to include in the correlation plot
 names(NDVI)
-
+# add a line here
 #here include the column number of each variable you want to include in the correlation plot
 cor_new <- NDVI[,c(12,14,15,17,39,48)]
 cor_new <- na.omit(cor_new)
