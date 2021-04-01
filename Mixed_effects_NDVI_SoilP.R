@@ -6,13 +6,22 @@ library(sjmisc)
 library(sjlabelled)
 
 ndvi<-read.csv(file.choose())
-names(ndvi)
+str(ndvi)
 head(ndvi)
 
 #I think this is the best mixed effects model
 lme_ndvi<-lmer(NDVI1~log(soil.P)+(1|Site.name), data=ndvi)#+(1|Site)
 summary(lme_ndvi)
 tab_model(lme_ndvi)
+r.squaredGLMM(lme_ndvi)
+pred<-predict(lme_ndvi)
+pred
+fitted(lme_ndvi)
+
+##Plotting predictions vs observations
+xyplot(pred~ndvi$NDVI1)
+
+
 
 lme_ndvi2<-lmer(NDVI1~log(soil.P)+(1|Site.name/Dist.name), data=ndvi)#+(1|Site)
 summary(lme_ndvi2)
