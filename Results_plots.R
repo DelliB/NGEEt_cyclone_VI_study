@@ -7,6 +7,7 @@
 library(tidyverse)
 library(ggpubr)
 library(multcompView)
+library(ggcorrplot)
 
 # Dellena file path
 data_directory <- '~/Documents/Kueppers lab'
@@ -30,8 +31,44 @@ dLL2 = expression(Delta*"LL sub-annual")
 dNDVI1 = expression(Delta*"NDVI annual")
 dNDVI2 = expression(Delta*"NDVI sub-annual")
 
+# TUKEY
+generate_label_df <- function(TUKEY, variable){
+  Tukey.levels <- TUKEY[[variable]][,4]
+  Tukey.labels <- data.frame(multcompLetters(Tukey.levels)['Letters'])
+  Tukey.labels$treatment=rownames(Tukey.labels)
+  Tukey.labels=Tukey.labels[order(Tukey.labels$treatment) , ]
+  return(Tukey.labels)
+}
+model=lm(NDVI$NDVI2~NDVI$Holdridge)
+ANOVA=aov(model)
+TUKEY <- TukeyHSD(x=ANOVA, 'NDVI$Holdridge', conf.level=0.95)
+labels <- generate_label_df(TUKEY , "NDVI$Holdridge")
+
 ### Plots
-# Change in litterfall (TL and LL) and delta NDVI (1 and 2) correlations- 4 total
+# Holdridge life zone histogram; Figure 1
+ggplot(NDVI, aes(x = factor(Holdridge), color = Holdridge))+
+  geom_bar(stat="count", width=0.7, aes(fill = Holdridge)) +
+  labs(y = "Number of Observations", x = "Holdridge Life Zone") +
+  geom_vline(xintercept=c(3.5, 6.5), color = "gray") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "right",
+        plot.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text = element_text(size = 13, color = "black"),
+        axis.title = element_text(size = 13, color = "black"),
+        panel.grid.minor = element_blank()) +
+  annotate("text", x = 2, y = 6,
+           label = c("7")) +
+  annotate("text", x = 5, y = 6,
+           label = c("9")) +
+  annotate("text", x = 8, y = 6,
+           label = c("12"))
+ggsave("Holdridge_histogram.png", width = 8, height = 5, path = data_directory)
+
+# Change in litterfall (TL and LL) and delta NDVI (1 and 2) correlations; Figure 3
 TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
@@ -107,7 +144,7 @@ print(LF_NDVI)
 
 ggsave("Results_TL_LL_NDVI.png", width = 6, height = 6, path = data_directory)
 
-# Soil P vs delta NDVI (1 and 2)- 2 total
+# Soil P vs delta NDVI (1 and 2); Figure 4
 PNDVI1 <- ggplot(NDVI, aes(x = log(soil.P), y = NDVI1)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, color = "black") +
@@ -148,16 +185,17 @@ ggarrange(PNDVI1, PNDVI2, ncol = 2, labels = c("a", "b"))
 
 ggsave("Results_soilP_NDVI.png", width = 6, height = 4, path = data_directory)
 
-# Broad HLZ vs delta NDVI (1 and 2)- 2 total
+# Broad HLZ vs delta NDVI (1 and 2); Figure 7
 BHLZNDVI1 <- ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI1)) +
   geom_boxplot() +
   stat_summary(fun=mean, geom="point", size=1) +
-  labs(x = "", y = dNDVI1) +
+  labs(y = dNDVI1) +
   theme_bw() +
   geom_hline(yintercept=c(0), color = "gray") +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
         plot.title = element_blank(),
+        axis.title.x = element_blank(),
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank()) +
@@ -171,12 +209,13 @@ BHLZNDVI1 <- ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI1)) +
 BHLZNDVI2 <- ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI2)) +
   geom_boxplot() +
   stat_summary(fun=mean, geom="point", size=1) +
-  labs(x = "Broad Holdridge Life Zone Classifications", y = dNDVI2) +
+  labs(y = dNDVI2) +
   theme_bw() +
   geom_hline(yintercept=c(0), color = "gray") +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
         plot.title = element_blank(),
+        axis.title.x = element_blank(),
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank()) +
@@ -185,11 +224,13 @@ BHLZNDVI2 <- ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI2)) +
   annotate("text", x = 3, y = .25,
            label = c("A"))
 
-ggarrange(BHLZNDVI1, BHLZNDVI2, nrow = 2, labels = c("a", "b"))
+BHLZ <- ggarrange(BHLZNDVI1, BHLZNDVI2, ncol = 2, labels = c("a", "b"))
+annotate_figure(BHLZ, bottom = text_grob("Moisture Based Forest Types", size = 13,
+                                         color = "black"))
 
-ggsave("Results_BHLZ_NDVI.png", width = 5, height = 8, path = data_directory)
+ggsave("Results_BHLZ_NDVI.png", width = 8, height = 5, path = data_directory)
 
-# Narrow HLZ vs delta NDVI (1 and 2)- 2 total
+# Narrow HLZ vs delta NDVI (1 and 2); Figure 6
 HLZNDVI1 <- ggplot(NDVI, aes(x = Holdridge, y = NDVI1, color = Holdridge)) +
   geom_boxplot() +
   stat_summary(fun=mean, geom="point", size=1) +
@@ -260,5 +301,43 @@ ggarrange(HLZNDVI1, HLZNDVI2, nrow = 2, labels = c("a", "b"), common.legend = TR
 
 ggsave("Results_HLZ_NDVI.png", width = 8, height = 7, path = data_directory)
 
+# Correlation plot; Figure 5
+# renaming columns
+NDVI <- NDVI %>%
+  rename("storm frequency" = Storm_frequency)
+NDVI <- NDVI %>%
+  rename("annual change in NDVI" = NDVI1)
+NDVI <- NDVI %>%
+  rename("sub-annual change in NDVI" = NDVI2)
+NDVI <- NDVI %>%
+  rename("soil phosphorus" = soil.P)
+NDVI <- NDVI %>%
+  rename("distance to cyclone" = Distance_km)
+NDVI <- NDVI %>%
+  rename("wind speed" = wind_kts)
+
+#check column number for the variables you want to include in the correlation plot
+names(NDVI)
+# add a line here
+cor_new <- NDVI[,c(12,14,15,17,39,48)]
+cor_new <- na.omit(cor_new)
+str(cor_new)
+
+corr_1to21 <- round(cor(cor_new,method="pearson"),1)
+p.mat_1to21 <- cor_pmat(corr_1to21)
+corr_1to21
+
+# make figure
+Fig_corr<-ggcorrplot(corr_1to21, hc.order = TRUE, type = "lower",hc.method = "ward.D2",
+                     outline.col = "white", p.mat = p.mat_1to21, method="square",
+                     ggtheme=ggplot2::theme_bw(),
+                     show.legend=TRUE, legend.title="Pearson's r", lab=TRUE, 
+                     lab_size=5, tl.cex=14,colors = c("#003f5c", "white", 
+                     "#ffa600",pch.cex=20,nbreaks = 8,legend.text.cex=20))
+Fig_corr
+
+ggsave(filename = "Fig_corr.png",
+       plot = Fig_corr, width = 12, height = 12, units = 'cm',
+       scale = 2, dpi = 600, path = data_directory)
 
 
