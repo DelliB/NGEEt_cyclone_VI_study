@@ -224,11 +224,11 @@ BHLZNDVI2 <- ggplot(NDVI, aes(x = Broad.Life.Zone, y = NDVI2)) +
   annotate("text", x = 3, y = .25,
            label = c("A"))
 
-BHLZ <- ggarrange(BHLZNDVI1, BHLZNDVI2, ncol = 2, labels = c("a", "b"))
+BHLZ <- ggarrange(BHLZNDVI1, BHLZNDVI2, nrow = 2, labels = c("a", "b"))
 annotate_figure(BHLZ, bottom = text_grob("Moisture Based Forest Types", size = 13,
                                          color = "black"))
 
-ggsave("Results_BHLZ_NDVI.png", width = 8, height = 5, path = data_directory)
+ggsave("Results_BHLZ_NDVI.png", width = 5, height = 8, path = data_directory)
 
 # Narrow HLZ vs delta NDVI (1 and 2); Figure 6
 HLZNDVI1 <- ggplot(NDVI, aes(x = Holdridge, y = NDVI1, color = Holdridge)) +
