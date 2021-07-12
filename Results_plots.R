@@ -13,14 +13,14 @@ library(ggcorrplot)
 data_directory <- '~/Documents/Kueppers lab'
 
 # load data
-NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), stringsAsFactors = FALSE)
+NDVI <- read.csv(file.path(data_directory, "case_study_data.csv"), stringsAsFactors = FALSE)
 
 # data frame organizations
 #NDVInodry <- NDVI[which(NDVI$Broad.Life.Zone != "Dry"),]
 #NDVIdry <- NDVI[which(NDVI$Broad.Life.Zone == "Dry"),]
 
 # ordering HLZ classifications
-NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
+#NDVI$Holdridge <- factor(NDVI$Holdridge, levels=c("Subtropical Dry", "Subtropical Premontane Dry", "Tropical Dry", "Subtropical Moist", "Subtropical Lowermontane Moist", "Tropical Moist", "Subtropical Wet", "Subtropical Lowermontane Wet", "Subtropical Lowermontane Rain"))
 
 # axis labels
 x = expression(paste(log[10],"(soil P (mg/kg))"))
@@ -69,7 +69,7 @@ ggplot(NDVI, aes(x = factor(Holdridge), color = Holdridge))+
 ggsave("Holdridge_histogram.png", width = 8, height = 5, path = data_directory)
 
 # Change in litterfall (TL and LL) and delta NDVI (1 and 2) correlations; Figure 3
-TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
+TLNDVI1 <- ggplot(NDVI, aes(x = X_NDVI.annual, y = X_TL.annual)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
@@ -87,7 +87,7 @@ TLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_TL_1)) +
   annotate("text", x = -0.115, y = -40,
            label = c("Baseline"))
 
-TLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_TL_2)) +
+TLNDVI2 <- ggplot(NDVI, aes(x = X_NDVI.sub.annual, y = X_TL.sub.annual)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
@@ -103,7 +103,7 @@ TLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_TL_2)) +
         axis.text = element_text(size = 13, color = "Black"),
         panel.grid.minor = element_blank())
 
-LLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_LL_1)) +
+LLNDVI1 <- ggplot(NDVI, aes(x = X_NDVI.annual, y = X_LL.annual)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
@@ -119,7 +119,7 @@ LLNDVI1 <- ggplot(NDVI, aes(x = G_NDVI1, y = G_LL_1)) +
         axis.text = element_text(size = 13, color = "Black"),
         panel.grid.minor = element_blank())
 
-LLNDVI2 <- ggplot(NDVI, aes(x = G_NDVI2, y = G_LL_2)) +
+LLNDVI2 <- ggplot(NDVI, aes(x = X_NDVI.sub.annual, y = X_LL.sub.annual)) +
   geom_point(size = 1) +
   geom_smooth(method=lm, se=FALSE, fullrange=FALSE, linetype = "dashed") +
   stat_cor(method = "pearson", size = 4,
