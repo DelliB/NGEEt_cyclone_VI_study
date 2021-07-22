@@ -31,11 +31,14 @@ pcor.test(cleaned_data$LAIchange, cleaned_data$soilP,
           cleaned_data$Windspeed, method="pearson")
 # Result: not statistically significant, but the outcome table indicates that the 
 # partial correlation between change in LAI and soil P after entirely controlling 
-# for the effects of sum of learning = -0.262.
+# for the effects of wind speed = -0.262.
+# ***this was inflated by the wind speed effects***
 # Overall, the partial correlation coefficient is a measure of the strength of the 
 # linear relationship between two variables after entirely controlling for the 
 # effects of other variables.
-
+pcor.test(cleaned_data$LAIchange, cleaned_data$Windspeed, 
+          cleaned_data$soilP, method="pearson")
+# = -0.618 and significant
 
 ## Semi-Partial Correlation
 # Calculates the correlation between all change in LAI and the parts of soil P
@@ -48,7 +51,9 @@ spcor.test(cleaned_data$LAIchange, cleaned_data$soilP,
 # Overall, the semi-partial correlation coefficient is the correlation between 
 # all of Y and that part of X which is independent of Z. That is the effect of Z 
 # has been removed from X but not from Y.
-
+spcor.test(cleaned_data$LAIchange, cleaned_data$Windspeed, 
+           cleaned_data$soilP, method="pearson")
+# = -0.567 and significant
 
 
 

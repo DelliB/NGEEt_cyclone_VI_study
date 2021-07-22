@@ -16,7 +16,7 @@ data_directory <- '~/Documents/Kueppers lab'
 VI <- read.csv(file.path(data_directory, "case_study_data.csv"), stringsAsFactors = FALSE)
 
 # axis labels
-x = expression(paste(log[10],"(soil P (mg/kg))"))
+x = expression(paste(ln,"(soil P (mg/kg))"))
 dTL1 = expression(Delta*"TL annual")
 dTL2 = expression(Delta*"TL sub-annual")
 dLL1 = expression(Delta*"LL annual")
@@ -429,7 +429,7 @@ VI <- VI %>%
   rename("wind speed (kt)" = peak_wind_speed_ms)
 VI$soil.P..mg.kg. <- log(VI$soil.P..mg.kg.)
 VI <- VI %>%
-  rename("soil phosphorus (mg/kg)" = soil.P..mg.kg.)
+  rename("soil phosphorus" = soil.P..mg.kg.)
 
 ## All
 # selecting columns
