@@ -21,6 +21,10 @@ x = expression(paste(ln,"(soil P (mg/kg))"))
 dLAI1 = expression(Delta*"LAI annual (500m)")
 dLAI2 = expression(Delta*"LAI sub-annual (500m)")
 
+# setup dataframe
+VI <- VI %>%
+  select(soil.P..mg.kg., change_annual_LAI_500m, change_annual_EVI_250m)
+
 ## Change in LAI vs soil P scatterplot for comparison
 ggplot(VI, aes(x = log(soil.P..mg.kg.), y = change_annual_LAI_500m)) +
   geom_point(size = 1) +
@@ -50,11 +54,11 @@ VI$soil.P..mg.kg. <- log(VI$soil.P..mg.kg.)
 VI <- VI %>%
   rename("soil phosphorus" = soil.P..mg.kg.)
 VI <- VI %>%
-  rename("annual change in NDVI 250m" = change_annual_NDVI_250m)
+  rename("annual change in EVI 250m" = change_annual_EVI_250m)
 
 # Corr plot
 names(VI)
-cor_new <- VI[,c(22, 38, 46)]
+cor_new <- VI[,c(1, 2, 3)]
 cor_new <- na.omit(cor_new) # has 21 values in length
 str(cor_new) #check and see if you got it right
 
