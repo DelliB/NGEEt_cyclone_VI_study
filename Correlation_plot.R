@@ -1,5 +1,5 @@
 # Dellena Bloom
-# March 23rd, 2021
+# March 23rd, 2021 and July 2nd, 2021
 # Correlation plot
 
 # load packages
@@ -10,28 +10,24 @@ library(ggcorrplot)
 data_directory <- '~/Documents/Kueppers lab'
 
 # load data
-NDVI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), stringsAsFactors = FALSE)
+VI <- read.csv(file.path(data_directory, "new_Disturbance_details_NDVI.csv"), stringsAsFactors = FALSE)
 
 # renaming columns
-NDVI <- NDVI %>%
-  rename("storm frequency (storms/year)" = Storm_frequency)
-NDVI <- NDVI %>%
-  rename("annual change in NDVI" = NDVI1)
-NDVI <- NDVI %>%
-  rename("sub-annual change in NDVI" = NDVI2)
-NDVI <- NDVI %>%
-  rename("soil phosphorus (mg/kg)" = soil.P)
-NDVI <- NDVI %>%
-  rename("distance to cyclone (km)" = Distance_km)
-NDVI <- NDVI %>%
-  rename("wind speed (kt)" = wind_kts)
+VI <- VI %>%
+  rename("annual change in NDVI 250m" = change_annual_NDVI_250m)
+VI <- VI %>%
+  rename("annual change in EVI 250m" = change_annual_EVI_250m)
+VI <- VI %>%
+  rename("annual change in LAI 500m" = change_annual_LAI_500m)
+VI <- VI %>%
+  rename("wind speed (kt)" = peak_wind_speed_ms)
 
 #prepare data frame including the variables of interest
 #check column number for the variables you want to include in the correlation plot
-names(NDVI)
+names(VI)
 # add a line here
 #here include the column number of each variable you want to include in the correlation plot
-cor_new <- NDVI[,c(12,14,15,17,39,48)]
+cor_new <- VI[,c(30, 38, 46, 80)]
 cor_new <- na.omit(cor_new)
 str(cor_new)#check and see if you got it right
 

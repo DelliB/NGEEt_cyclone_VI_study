@@ -4,15 +4,19 @@ library(lme4)
 library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
+library(tidyverse)
 
 ndvi<-read.csv(file.choose())
 str(ndvi)
 head(ndvi)
 
+data_directory <- '~/Documents/Kueppers lab'
+
 #I think this is the best mixed effects model
 lme_ndvi<-lmer(NDVI1~log(soil.P)+(1|Site.name), data=ndvi)#+(1|Site)
 summary(lme_ndvi)
 tab_model(lme_ndvi)
+#ggsave("Results_mixedeffects_sitename.png", width = 5, height = 5, path = data_directory)
 r.squaredGLMM(lme_ndvi)
 pred<-predict(lme_ndvi)
 pred
