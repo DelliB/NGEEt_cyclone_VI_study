@@ -54,14 +54,21 @@ summary(LAIsoilPln)
 
 
 ## with log transformation of soil P and wind speed considered
-LAIsoilPln <- lmer(change_annual_LAI_500m ~ log(soil.P..mg.kg.) + peak_wind_speed_ms, data = VI)
+LAIsoilPln <- lm(change_annual_LAI_500m ~ log(soil.P..mg.kg.) + peak_wind_speed_ms, data = VI)
 summary(LAIsoilPln)
 # how should I write this equation?
 # WSEstimate = -0.015386; sPEstimate = -0.073314; Intercept = 0.795254; Multiple R^2 = 0.4582; 
 # p-value = 0.00743
 
 
+## Wind speed and change in LAI
+LAIws <- lm(change_annual_LAI_500m ~ peak_wind_speed_ms, data = VI)
+summary(LAIws)
+# Estimate = -0.017885; Intercept = 0.471484; Multiple R^2 = 0.442; p-value = 0.001898
+
+
 ## LAI and total ground litter fall
+# if one predictor then use regular R-squared, but use adjusted with multiple
 LAIaTL <- lm(change_annual_total_litterfall ~ change_annual_LAI_500m, data = VI)
 summary(LAIaTL)
 # Estimate = -3.1142; Intercept = 1.7115; Multiple R^2 = 0.2741; p-values = 0.01485

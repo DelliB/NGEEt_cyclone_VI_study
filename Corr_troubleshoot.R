@@ -22,8 +22,8 @@ dLAI1 = expression(Delta*"LAI annual (500m)")
 dLAI2 = expression(Delta*"LAI sub-annual (500m)")
 
 # setup dataframe
-VI <- VI %>%
-  select(soil.P..mg.kg., change_annual_LAI_500m, change_annual_EVI_250m)
+VI2 <- VI %>%
+  select(soil.P..mg.kg., change_annual_LAI_500m, change_annual_EVI_250m, )
 
 ## Change in LAI vs soil P scatterplot for comparison
 ggplot(VI, aes(x = log(soil.P..mg.kg.), y = change_annual_LAI_500m)) +
@@ -48,18 +48,19 @@ ggplot(VI, aes(x = log(soil.P..mg.kg.), y = change_annual_LAI_500m)) +
 
 ## Correlation plots
 # Renaming variables
-VI <- VI %>%
+VI2 <- VI2 %>%
   rename("annual change in LAI 500m" = change_annual_LAI_500m)
-VI$soil.P..mg.kg. <- log(VI$soil.P..mg.kg.)
-VI <- VI %>%
+VI2$soil.P..mg.kg. <- log(VI$soil.P..mg.kg.)
+VI2 <- VI2 %>%
   rename("soil phosphorus" = soil.P..mg.kg.)
-VI <- VI %>%
+VI2 <- VI2 %>%
   rename("annual change in EVI 250m" = change_annual_EVI_250m)
 
 # Corr plot
-names(VI)
-cor_new <- VI[,c(1, 2, 3)]
+names(VI2)
+cor_new <- VI2[,c(1, 2, 3)]
 cor_new <- na.omit(cor_new) # has 21 values in length
+# can remove NA for a specific row
 str(cor_new) #check and see if you got it right
 
 # correlations
