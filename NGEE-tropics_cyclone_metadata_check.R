@@ -23,7 +23,7 @@ unique(levels(as.factor(VI$Area)))
 unique(levels(as.factor(VI$Cyclone_name)))
 unique(levels(as.factor(VI$Site)))
 unique(levels(as.factor(VI$Forest_type)))
-unique(levels(as.factor(VI$Holdridge_life_zone)))
+unique(levels(as.factor(VI$Parent_material)))
 
 
 ## MODIS-recovery metadata
