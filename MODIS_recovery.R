@@ -7,19 +7,21 @@
 library(tidyverse)
 library(ggpubr)
 library(multcompView)
-#library(ggcorrplot)
+library(ggcorrplot)
 
 # Dellena file path
 data_directory <- '~/Documents/Kueppers lab'
 
 # load data
-recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), stringsAsFactors= FALSE)
+recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), stringsAsFactors= FALSE, na.strings = '-9999')
+LFreco <- read.csv(file.path(data_directory, "MODIS_recovery_bb.csv"), stringsAsFactors= FALSE)
 
 # axis labels
 LAIreco = expression(Delta*"LAI 500m [LAI/LAI]")
 EVIreco = expression(Delta*"EVI 250m [EVI/EVI]")
 NDVIreco = expression(Delta*"NDVI 250m [NDVI/NDVI]")
 x = "Time since disturbance (months)"
+#Pantropical_LAI = c("Pantropical", expression(Delta*"LAI"))
 
 ### Timeseries
 ## Pantropical data calculation
@@ -31,22 +33,32 @@ LAIm <- recovery %>%
             SD = sd(LAI_change_500m),
             n = length(LAI_change_500m))
 LAIm <- merge(LAIm, recovery, by = "month")
-error <- qnorm(0.975) * LAIm$SD/sqrt(LAIm$n)
+error <- qnorm(0.95) * LAIm$SD/sqrt(LAIm$n)
 # this is standard error
 # .975 if having a normal distribution and .95 if not?
 LAIm$min = LAIm$m - error
 LAIm$max = LAIm$m + error
 
+# LF
+LFerror <- qnorm(0.95) * LFreco$Pantropical_Litterfall_Std_dev/sqrt(LFreco$Number_Case_Studies)
+LFreco$min = LFreco$Pantropical_Litterfall_Mean - LFerror
+LFreco$max = LFreco$Pantropical_Litterfall_Mean + LFerror
+
 ## Plot
 # LAI
 ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = region)) +
-  geom_line(data = LAIm[!is.na(LAIm$LAI_change_500m),]) +
+  geom_line(data = LAIm[!is.na(LAIm$LAI_change_500m),], linetype = "dashed") +
   geom_ribbon(aes(x = month, ymin = min, ymax = max), 
               fill = "light blue", alpha = 0.05, color = NA) +
-  geom_line(aes(x = month, y = m, color = "Pantropical mean")) +
+  geom_line(aes(x = month, y = m, color = "Pantropical Δ LAI"), lwd=1) +
+  geom_ribbon(data = LFreco, aes(x = month, ymin = min, ymax = max), 
+              fill = "gray", alpha = 0.25, color = NA) +
+  geom_line(data = LFreco, aes(x = month, y = Pantropical_Litterfall_Mean, 
+                               color = "Pantropical litterfall"), lwd=1) +
   labs(x = x, y = LAIreco, color = "Region") +
   ylim(-1.5, 1.5) +
   geom_hline(yintercept=c(0), color = "gray") +
+  scale_color_manual(values = c("red2", "yellow3", "springgreen4", "black", "deepskyblue3", "orchid")) +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -57,8 +69,13 @@ ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = reg
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank()) +
-  guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave("recovery_LAI_500m.png", width = 7, height = 5, path = data_directory)
+  labs(caption = "Lines are pantropical mean and shaded areas represent mean \nsubtracted by standard error") +
+  guides(color = guide_legend(nrow=2,byrow=TRUE))
+ggsave("recovery_LAI_LF_500m.png", width = 7, height = 5, path = data_directory)
+
+#guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+#  scale_color_manual(values = c( "Pantropical mean" = "light blue", "Pantropical LF mean" = "purple", 
+ #                                "Australia" = "red", "Mexico" = "green", "Caribbean" = "tan", "Taiwan" = "pink"))
 
 LAI <- ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = region)) +
   geom_line(data = LAIm[!is.na(LAIm$LAI_change_500m),]) +
