@@ -7,7 +7,7 @@
 library(tidyverse)
 library(ggpubr)
 library(multcompView)
-library(ggcorrplot)
+#library(ggcorrplot)
 
 # Dellena file path
 data_directory <- '~/Documents/Kueppers lab'
