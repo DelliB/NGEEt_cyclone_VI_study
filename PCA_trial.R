@@ -18,16 +18,13 @@ VI <- read.csv(file.path(data_directory, "case_study_data.csv"), stringsAsFactor
 # annual TL
 VI$change_annual_total_litterfall = log(VI$Response_Post_Mean_Tot_Litterfall 
                                         / VI$Pre_Mean_Tot_Litterfall_g.m2.day)
-# sub-annual TL
-VI$change_subannual_total_litterfall = log(VI$Response_Post_Mean_Tot_Litterfall
-                                           / VI$Subannual_Pre_mean_Tot_Litterfall)
 
 
 # select columns for analysis
 names(VI)
 #VI.PCA <- VI %>% select() # another way to select the columns
 VI.PCA <- VI[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", "Longitude", "gale.wind.duration..minutes.",
-                "peak_wind_speed_ms", "change_annual_total_litterfall", "change_subannual_total_litterfall",
+                "peak_wind_speed_ms", "change_annual_total_litterfall", 
                 "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", "Parent_material", "MAT_MAP_ratio_X100",
                 "Cyclone_Rainfall_mm", "Region", "N")]
 
@@ -39,7 +36,7 @@ VI.PCA <- VI.PCA %>%
 write.csv(VI.PCA, file = "~/Documents/Kueppers Lab/case_study_for_PCA.csv")
 
 # get number of unique variable names for non-numeric categories
-unique(levels(as.factor(VI2$Parent_material)))
+unique(levels(as.factor(VI.PCA$Parent_material)))
 #unique(levels(as.factor(VI.PCA$Cyclone_name)))
 
 # read in new csv
@@ -47,26 +44,25 @@ VI2 <- read.csv(file.path(data_directory, "case_study_for_PCA.csv"), na.strings 
 
 # select only numeric columns and remove parent materials
 VI2.PCA <- VI2[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", "Longitude", "gale.wind.duration..minutes.",
-                "peak_wind_speed_ms", "change_annual_total_litterfall", "change_subannual_total_litterfall",
+                "peak_wind_speed_ms", "change_annual_total_litterfall",
                 "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", "Parent_material_ID", "MAT_MAP_ratio_X100",
                 "Cyclone_Rainfall_mm")]
 # maybe include a few other VIs and see if its related to the resolution or 
 # if its due to the VI
 
 # rename columns
-VI2.PCA <- rename(VI2.PCA, "change annual LAI (500m)" = change_annual_LAI_500m)
-VI2.PCA <- rename(VI2.PCA, "Holdridge Life Zone" = Holdridge_ID)
-VI2.PCA <- rename(VI2.PCA, "soil phosphorus" = soil_P)
-VI2.PCA <- rename(VI2.PCA, "wind duration" = gale.wind.duration..minutes.)
-VI2.PCA <- rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
-VI2.PCA <- rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
-VI2.PCA <- rename(VI2.PCA, "change subannual TL" = change_subannual_total_litterfall)
-VI2.PCA <- rename(VI2.PCA, "years since last storm" = Years_since_last_storm)
-VI2.PCA <- rename(VI2.PCA, "elevation" = Elevation_m)
-VI2.PCA <- rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
-VI2.PCA <- rename(VI2.PCA, "parent material" = Parent_material_ID)
-VI2.PCA <- rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
-VI2.PCA <- rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
+VI2.PCA <- dplyr::rename(VI2.PCA, "change annual LAI (500m)" = change_annual_LAI_500m)
+VI2.PCA <- dplyr::rename(VI2.PCA, "Holdridge Life Zone" = Holdridge_ID)
+VI2.PCA <- dplyr::rename(VI2.PCA, "soil phosphorus" = soil_P)
+VI2.PCA <- dplyr::rename(VI2.PCA, "wind duration" = gale.wind.duration..minutes.)
+VI2.PCA <- dplyr::rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
+VI2.PCA <- dplyr::rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
+VI2.PCA <- dplyr::rename(VI2.PCA, "years since last storm" = Years_since_last_storm)
+VI2.PCA <- dplyr::rename(VI2.PCA, "elevation" = Elevation_m)
+VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
+VI2.PCA <- dplyr::rename(VI2.PCA, "parent material" = Parent_material_ID)
+VI2.PCA <- dplyr::rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
+VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
 
 # select for non-NA values
 VI2.PCA.B <- VI2.PCA %>%
@@ -92,15 +88,17 @@ fviz_pca_biplot(VI.pca, repel = TRUE,
 )
 
 # to make plot with color
-country <- c(rep("Taiwan", 4), rep("Caribbean", 6), rep("Mexico", 2), rep("Caribbean", 2))
+country <- c("Australia", rep("Taiwan", 4), rep("Caribbean", 4), rep("Taiwan", 4), rep("Caribbean", 2), rep("Mexico", 2), rep("Caribbean", 2))
 print(country)
-ggbiplot(VI.pca, ellipse = FALSE, obs.scale = 1, var.scale = 1, groups = country) +
+ggbiplot(VI.pca, ellipse = TRUE, obs.scale = 1, var.scale = 1, groups = country) +
   labs(color = "Region") +
-  ylim(-4.5, 4.5) +
-  xlim(-5, 5.5) +
+  ylim(-4.8, 4.1) +
+  xlim(-4.2, 5.5) +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
+        axis.title = element_text(size = 13, color = "black"),
+        axis.text = element_text(size = 12, color = "black"),
         legend.position = "bottom",
         legend.text = element_text(size = 13, color = "black"),
         legend.title = element_text(size = 13, color = "black"))
