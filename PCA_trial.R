@@ -5,6 +5,7 @@
 # load libraries
 library(tidyverse)
 library(factoextra)
+library(ggbiplot)
 
 # Dellena file path
 #data_directory1 <- '~/Documents/GitHub/NGEEtropics_SULI_spring'
@@ -56,10 +57,10 @@ VI2.PCA <- VI2[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", "Longitude
 VI2.PCA <- rename(VI2.PCA, "change annual LAI (500m)" = change_annual_LAI_500m)
 VI2.PCA <- rename(VI2.PCA, "Holdridge Life Zone" = Holdridge_ID)
 VI2.PCA <- rename(VI2.PCA, "soil phosphorus" = soil_P)
-VI2.PCA <- rename(VI2.PCA, "gale wind duration" = gale.wind.duration..minutes.)
-VI2.PCA <- rename(VI2.PCA, "peak wind speed" = peak_wind_speed_ms)
-VI2.PCA <- rename(VI2.PCA, "change total litterfall" = change_annual_total_litterfall)
-VI2.PCA <- rename(VI2.PCA, "change subannual total litterfall" = change_subannual_total_litterfall)
+VI2.PCA <- rename(VI2.PCA, "wind duration" = gale.wind.duration..minutes.)
+VI2.PCA <- rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
+VI2.PCA <- rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
+VI2.PCA <- rename(VI2.PCA, "change subannual TL" = change_subannual_total_litterfall)
 VI2.PCA <- rename(VI2.PCA, "years since last storm" = Years_since_last_storm)
 VI2.PCA <- rename(VI2.PCA, "elevation" = Elevation_m)
 VI2.PCA <- rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
@@ -92,12 +93,18 @@ fviz_pca_biplot(VI.pca, repel = TRUE,
 
 # to make plot with color
 country <- c(rep("Taiwan", 4), rep("Caribbean", 6), rep("Mexico", 2), rep("Caribbean", 2))
-ggbiplot(VI.pca, ellipse = TRUE, obs.scale = 1, var.scale = 1, groups = country) +
-theme_bw() +
+print(country)
+ggbiplot(VI.pca, ellipse = FALSE, obs.scale = 1, var.scale = 1, groups = country) +
+  labs(color = "Region") +
+  ylim(-4.5, 4.5) +
+  xlim(-5, 5.5) +
+  theme_bw() +
   theme(panel.background = element_blank(),
-        panel.grid.major = element_blank()) +
-  theme(legend.position = "bottom")
-ggsave("PCA.png", width = 7, height = 5, path = data_directory)
+        panel.grid.major = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 13, color = "black"),
+        legend.title = element_text(size = 13, color = "black"))
+ggsave("PCA.png", width = 7, height = 6, path = data_directory)
 
 
 
@@ -106,7 +113,6 @@ ggsave("PCA.png", width = 7, height = 5, path = data_directory)
 #packages
 library(devtools)
 install_github("vqv/ggbiplot")
-library(ggbiplot)
 library(grid)
 
 #reading data

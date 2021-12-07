@@ -33,16 +33,18 @@ LAIm <- recovery %>%
             SD = sd(LAI_change_500m),
             n = length(LAI_change_500m))
 LAIm <- merge(LAIm, recovery, by = "month")
-error <- qnorm(0.95) * LAIm$SD/sqrt(LAIm$n)
+# took "qnorm(0.95) *" out from the beginning of the equation
+error <- LAIm$SD/sqrt(LAIm$n)
 # this is standard error
 # .975 if having a normal distribution and .95 if not?
-LAIm$min = LAIm$m - error
-LAIm$max = LAIm$m + error
+LAIm$min = LAIm$m - (1.96*error)
+LAIm$max = LAIm$m + (1.96*error)
 
 # LF
-LFerror <- qnorm(0.95) * LFreco$Pantropical_Litterfall_Std_dev/sqrt(LFreco$Number_Case_Studies)
-LFreco$min = LFreco$Pantropical_Litterfall_Mean - LFerror
-LFreco$max = LFreco$Pantropical_Litterfall_Mean + LFerror
+# took "qnorm(0.95) *" out from beginning of the equation
+LFerror <- LFreco$Pantropical_Litterfall_Std_dev/sqrt(LFreco$Number_Case_Studies)
+LFreco$min = LFreco$Pantropical_Litterfall_Mean - (1.96*LFerror)
+LFreco$max = LFreco$Pantropical_Litterfall_Mean + (1.96*LFerror)
 
 ## Plot
 # LAI
@@ -51,14 +53,15 @@ ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = reg
   geom_ribbon(aes(x = month, ymin = min, ymax = max), 
               fill = "light blue", alpha = 0.05, color = NA) +
   geom_line(aes(x = month, y = m, color = "Pantropical Δ LAI"), lwd=1) +
-  geom_ribbon(data = LFreco, aes(x = month, ymin = min, ymax = max), 
+  geom_ribbon(data = LFreco, aes(x = month, ymin = CI_lower_bound, ymax = CI_upper_bound), 
               fill = "gray", alpha = 0.25, color = NA) +
   geom_line(data = LFreco, aes(x = month, y = Pantropical_Litterfall_Mean, 
                                color = "Pantropical litterfall"), lwd=1) +
   labs(x = x, y = LAIreco, color = "Region") +
   ylim(-1.5, 1.5) +
   geom_hline(yintercept=c(0), color = "gray") +
-  scale_color_manual(values = c("red2", "yellow3", "springgreen4", "black", "deepskyblue3", "orchid")) +
+  scale_color_manual(values = c("red2", "yellow3", "springgreen4", "black", 
+                                "deepskyblue3", "orchid")) +
   theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -69,9 +72,9 @@ ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = reg
         axis.text = element_text(size = 13, color = "black"),
         axis.title = element_text(size = 13, color = "black"),
         panel.grid.minor = element_blank()) +
-  labs(caption = "Lines are pantropical mean and shaded areas represent mean \nsubtracted by standard error") +
+  labs(caption = "Solid lines are pantropical mean and shaded areas represent 95% CI") +
   guides(color = guide_legend(nrow=2,byrow=TRUE))
-ggsave("recovery_LAI_LF_500m.png", width = 7, height = 5, path = data_directory)
+ggsave("recovery_LAI_LF_500m.png", width = 7, height = 7, path = data_directory)
 
 #guides(color=guide_legend(nrow=2, byrow=TRUE)) +
 #  scale_color_manual(values = c( "Pantropical mean" = "light blue", "Pantropical LF mean" = "purple", 
