@@ -37,14 +37,16 @@ Cyclones alter tropical forest function, composition and structure, making effec
 
 1. Clone this repo (for help see this [tutorial](https://help.github.com/articles/cloning-a-repository/)).
 2. Published raw Data is being kept [here](http://dx.doi.org/10.15486/ngt/1847332).
-3. GEE documented data extraction code is kept [here](Repo folder containing data processing scripts/notebooks)
-4. etc...
+3. GEE documented data extraction code is kept [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/blob/main/doc/Bloom_GEE_code_documentation.pdf).
+    + Bloom_GEE_code_doc.pdf
+4. Data visualization code is kept [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/plots).
+    + Code to produce all plots found in Bloom_NGEEtropics_paper_plots.R
+5. Code used to run statistical analyses is kept [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/stats).
+    + Mixed effects models in Mixed_effects_investigation.R
+    + PCA in PCA_trial.R
 
-*If your project is well underway and setup is fairly complicated (ie. requires installation of many packages) create another "setup.md" file and link to it here*  
 
-5. Follow setup [instructions](Link to file)
-
-## Featured Notebooks/Analysis/Deliverables
+## Featured Deliverables
 * [Data product](http://dx.doi.org/10.15486/ngt/1847332)
     + Dellena Bloom, Barbara Bomfim, Lara Kueppers, Yanlei Feng(2022). LAI, EVI, NDVI, and kNDVI in 23 pantropical forests affected by 21 cyclones. NGEE Tropics Data Collection. Accessed at http://dx.doi.org/10.15486/ngt/1847332.
 * [Manuscript](link)
