@@ -12,9 +12,11 @@ library(multcompView)
 library(ggcorrplot)
 library(factoextra)
 library(ggbiplot)
+#library(packcircles)
 
 # Dellena file path
 data_directory <- '~/Documents/Kueppers lab'
+#data_directory <- 'private/data'
 
 # load data
 recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), 
@@ -22,13 +24,17 @@ recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"),
 LFreco <- read.csv(file.path(data_directory, "MODIS_recovery_bb.csv"), 
                    stringsAsFactors= FALSE)
 VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"), 
-                      stringsAsFactors= FALSE, na.strings = '-9999')
+                      stringsAsFactors= FALSE, na.strings = '-9999') %>%
+  drop_na(change_annual_LAI_500m)
 
 
 ## Axis labels
 # Change in LAI and EVI
 EVI = expression(Delta*"EVI annual (250m)")
 LAI = expression(Delta*"LAI annual (500m)")
+# Percent change in LAI and EVI
+PEVI = expression(Delta*"EVI annual % (250m)")
+PLAI = expression(Delta*"LAI annual % (500m)")
 # Litter fall
 dTL1 = expression(Delta*"TL annual")
 dLL1 = expression(Delta*"LL annual")
@@ -55,16 +61,19 @@ VIs_sites$change_annual_total_litterfall = log(
 # loading map
 world <- map_data("world")
 # plots
+# loading midpoint for map legend
+mid <- 0
 # LAI
+#LAI_data <- circleRepelLayout(VIs_sites, xlim = limits, ylim = limits)
 LAI_map <- ggplot() +
   geom_map(data = world, map = world,
     aes(long, lat, map_id = region),
     color = "black", fill = "white", size = 0.1) +
   coord_cartesian(ylim = c(-30, 30)) +
   geom_point(data = VIs_sites,
-    aes(x = Longitude, y = Latitude, color = change_annual_LAI_500m),
-    alpha = 0.6, size = 4) +
-  labs(y = "Latitude", x = "Longitude", color = LAI) +
+    aes(x = Longitude, y = Latitude, color = jitter(change_annual_LAI_500m*100)),
+    alpha = 0.5, size = 4) +
+  labs(y = "Latitude", x = "Longitude", color = PLAI) +
   theme_bw() +
   theme(legend.position = "right",
         panel.background = element_blank(),
@@ -73,7 +82,9 @@ LAI_map <- ggplot() +
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
         legend.title = element_text(size = 13, color = "Black"),
-        legend.text = element_text(size = 13, color = "Black")) 
+        legend.text = element_text(size = 13, color = "Black")) +
+  scale_color_gradient2(midpoint=mid, low="red", mid="white",
+                        high="green")
 
 # EVI
 EVI_map <- ggplot() +
@@ -82,11 +93,10 @@ EVI_map <- ggplot() +
            color = "black", fill = "white", size = 0.1) +
   coord_cartesian(ylim = c(-30, 30)) +
   geom_point(data = VIs_sites,
-             aes(x = Longitude, y = Latitude, color = change_annual_EVI_250m),
-             alpha = 0.6, size = 4) +
-  labs(y = "Latitude", x = "Longitude", color = EVI) +
+             aes(x = Longitude, y = Latitude, color = change_annual_EVI_250m*100),
+             alpha = 0.5, size = 4) +
+  labs(y = "Latitude", x = "Longitude", color = PEVI) +
   theme_bw() +
-  scale_color_continuous(breaks = c(-0.4, 0, 0.3)) +
   theme(legend.position = "right",
         panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -94,7 +104,9 @@ EVI_map <- ggplot() +
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
         legend.title = element_text(size = 13, color = "Black"),
-        legend.text = element_text(size = 13, color = "Black"))
+        legend.text = element_text(size = 13, color = "Black")) +
+  scale_color_gradient2(midpoint=mid, low="red", mid="white",
+                        high="green", breaks = c(-60, 0, 20))
 
 # Join figures together and save
 map_LAI_EVI <- ggarrange(LAI_map, EVI_map, nrow = 2, ncol = 1, 
