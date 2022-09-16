@@ -11,7 +11,8 @@ library(ggpubr)
 library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
-#library(lme4)
+library(webshot)
+library(lme4)
 
 # Dellena file path
 #data_directory <- '~/Documents/Kueppers lab'
@@ -23,44 +24,38 @@ VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"),
   drop_na(change_annual_LAI_500m)
 
 
-## Calculating change in litter fall
-# annual total litter fall
-VIs_sites$change_annual_total_litterfall = log(
-  VIs_sites$Response_Post_Mean_Tot_Litterfall/
-    VIs_sites$Pre_Mean_Tot_Litterfall_g.m2.day)
-# annual leaf litter fall
-# VI$change_annual_leaf_litterfall = log(VI$Response_Post_Mean_Leaf_fall 
-#                                        / VI$Pre_Mean_Leaf_fall)
-
-
 ### Stats
 ## Regressions
 # LAI vs log transformed soil P
 LAIsoilP <- lm(change_annual_LAI_500m ~ log(soil_P), data = VIs_sites)
+# Print summary of regression in console
 summary(LAIsoilP)
-tab_model(lme_ndvi)
-ggsave("NDVI_MODIS_site_mixedeffects.png", width = 5, height = 5, path = data_directory)
+# Save regression output
+tab_model(LAIsoilP, file = "LAI_soilP_Reg.html")
+# Convert saved html to png
+webshot("LAI_soilP_Reg.html", "LAI_soilP_Reg.png")
 
-# Change annual ground litter fall vs LAI
-LAIaTL <- lm(change_annual_total_litterfall ~ change_annual_LAI_500m, data = VIs_sites)
-summary(LAIaTL)
+# EVI vs log transformed soil P
+EVIsoilP <- lm(change_annual_EVI_250m ~ log(soil_P), data = VIs_sites)
+summary(EVIsoilP)
+tab_model(EVIsoilP, file = "EVI_soilP_Reg.html")
+webshot("EVI_soilP_Reg.html", "EVI_soilP_Reg.png")
 
 
 ## Mixed effects
-# Wind speed effects on LAI vs log transformed soil phosphorous
-LAIsoilPWS <- lmer(change_annual_LAI_500m ~ log(soil_P) + (1|Region), data = VIs_sites)
+# Fixed effects: LAI vs log transformed soil phosphorous
+# Mixed effects: Wind speed effects on 
+LAIsoilPWS <- lmer(change_annual_LAI_500m ~ log(soil_P) + (1|peak_wind_speed_ms), 
+                   data = VIs_sites)
 summary(LAIsoilPWS)
+tab_model(LAIsoilPWS, file = "LAI_soilP_wind_ME.html")
+webshot("LAI_soilP_wind_ME.html", "LAI_soilP_wind_ME.png")
 
-# Wind speed effects on LAI vs change annual ground litter fall
-LAIaTLWS <- lmer(change_annual_LAI_500m ~ log(soil.P..mg.kg.) + peak_wind_speed_ms 
-                    + (1|Region), data = VIs_sites)
-summary(LAIaTLWS)
+# Wind speed effects on EVI vs log transformed soil phosphorous regression
+EVIsoilPWS <- lmer(change_annual_EVI_250m ~ log(soil_P) + (1|peak_wind_speed_ms), 
+                   data = VIs_sites)
+summary(EVIsoilPWS)
+tab_model(EVIsoilPWS, file = "EVI_soilP_wind_ME.html")
+webshot("EVI_soilP_wind_ME.html", "EVI_soilP_wind_ME.png")
 
-# Site effects on LAI vs log transformed soil phosphorous
-LAIsoilPS <- lmer(change_annual_LAI_500m ~ log(soil.P..mg.kg.) + (1|Region), data = VIs_sites)
-summary(LAIsoilPS)
-
-# Site effects on LAI vs change annual ground litter fall
-LAIaTLS <- lmer(change_annual_LAI_500m ~ log(soil.P..mg.kg.) + (1|Region), data = VIs_sites)
-summary(LAIaTLS)
 

@@ -1,5 +1,4 @@
-Combining ground and remote sensing data to estimate forest canopy damage and recovery from tropical cyclones over a pantropical soil phosphorus gradient
-=========================================================================================================================================================
+# Combining ground and remote sensing data to estimate forest canopy damage and recovery from tropical cyclones over a pantropical soil phosphorus gradient
 
 This project is a part of the
 [NGEE-tropics](https://ngee-tropics.lbl.gov) initiative. This specific
@@ -15,8 +14,7 @@ Feng](https://eesa.lbl.gov/profiles/yanlei-feng/).
 
 #### – Status: Completed
 
-Objective
----------
+## Objective
 
 This project is under the
 [RFA2](https://ngee-tropics.lbl.gov/research/research-focus-area-2/)
@@ -38,6 +36,7 @@ Engine](https://earthengine.google.com).
 
 -   Correlations
 -   Data Visualization
+-   Regressions
 -   Mixed Effects Models
 
 ### Technologies
@@ -45,8 +44,7 @@ Engine](https://earthengine.google.com).
 -   R
 -   Google Earth Engine
 
-Project Overview
-----------------
+## Project Overview
 
 Cyclones alter tropical forest function, composition and structure,
 making effects of intensifying cyclones on carbon-rich forests a
@@ -75,8 +73,7 @@ observations across a wider array of cyclone prone tropical forests and
 for observing effects of tropical cyclone regime alterations under
 climate change.
 
-Getting Started
----------------
+## Getting Started
 
 1.  Clone this repo (for help see this
     [tutorial](https://help.github.com/articles/cloning-a-repository/)).
@@ -84,32 +81,29 @@ Getting Started
     [here](http://dx.doi.org/10.15486/ngt/1847332).
 3.  GEE documented data extraction code is kept
     [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/blob/main/doc/Bloom_GEE_code_documentation.pdf).
-    -   Bloom\_GEE\_code\_doc.pdf
+    -   Bloom_GEE_code_doc.pdf
 4.  Data visualization code is kept
     [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/plots).
     -   Code to produce all plots found in
-        Bloom\_NGEEtropics\_paper\_plots.R
+        Bloom_NGEEtropics_paper_plots.R
 5.  Code used to run statistical analyses is kept
     [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/stats).
-    -   Mixed effects models in Mixed\_effects\_investigation.R
-    -   PCA in PCA\_trial.R
+    -   Bloom_NGEEtropics_paper_stats.R
 
-Featured Deliverables
----------------------
+## Featured Deliverables
 
 -   [Data product](http://dx.doi.org/10.15486/ngt/1847332)
     -   Dellena Bloom, Barbara Bomfim, Lara Kueppers, Yanlei Feng(2022).
         LAI, EVI, NDVI, and kNDVI in 23 pantropical forests affected by
         21 cyclones. NGEE Tropics Data Collection. Accessed at
-        <a href="http://dx.doi.org/10.15486/ngt/1847332" class="uri">http://dx.doi.org/10.15486/ngt/1847332</a>.
+        <http://dx.doi.org/10.15486/ngt/1847332>.
 -   [Manuscript](link)
     -   Citation
 
-Collaborators
--------------
+## Collaborators
 
 **Project lead: [Dellena
-Bloom](https://github.com/DelliB)(<a href="mailto:develyn.bloom@ufl.edu" class="email">develyn.bloom@ufl.edu</a>)**
+Bloom](https://github.com/DelliB)(<develyn.bloom@ufl.edu>)**
 
 #### Other Members:
 
@@ -119,8 +113,6 @@ Bloom](https://github.com/DelliB)(<a href="mailto:develyn.bloom@ufl.edu" class="
 | [Yanlei Feng]()                                | @             |
 | [Lara Kueppers](https://github.com/lmkueppers) | @lmkueppers   |
 
-Contact
--------
+## Contact
 
--   Dellena Bloom
-    (<a href="mailto:develyn.bloom@ufl.edu" class="email">develyn.bloom@ufl.edu</a>)
+-   Dellena Bloom (<develyn.bloom@ufl.edu>)

@@ -22,6 +22,7 @@ This project is under the [RFA2](https://ngee-tropics.lbl.gov/research/research-
 ### Methods Used
 * Correlations
 * Data Visualization
+* Regressions
 * Mixed Effects Models
 
 ### Technologies
@@ -42,8 +43,7 @@ Cyclones alter tropical forest function, composition and structure, making effec
 4. Data visualization code is kept [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/plots).
     + Code to produce all plots found in Bloom_NGEEtropics_paper_plots.R
 5. Code used to run statistical analyses is kept [here](https://github.com/DelliB/NGEEt_cyclone_VI_study/tree/main/stats).
-    + Mixed effects models in Mixed_effects_investigation.R
-    + PCA in PCA_trial.R
+    + Bloom_NGEEtropics_paper_stats.R
 
 
 ## Featured Deliverables
