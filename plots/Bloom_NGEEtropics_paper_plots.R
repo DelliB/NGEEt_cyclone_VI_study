@@ -15,8 +15,8 @@ library(ggbiplot)
 #library(packcircles)
 
 # Dellena file path
-data_directory <- '~/Documents/Kueppers lab'
-#data_directory <- 'private/data'
+#data_directory <- '~/Documents/Kueppers lab'
+data_directory <- 'private/data'
 
 # load data
 recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), 
@@ -60,19 +60,22 @@ VIs_sites$change_annual_total_litterfall = log(
 ## Figure 2: Maps of change in EVI and change in LAI
 # loading map
 world <- map_data("world")
+
 # plots
-# loading midpoint for map legend
-mid <- 0
+# Adding jitter to map points to view all points
+VIs_sites$lat <- jitter(VIs_sites$Latitude, factor = 200)
+VIs_sites$lon <- jitter(VIs_sites$Longitude, factor = 200)
+
 # LAI
 #LAI_data <- circleRepelLayout(VIs_sites, xlim = limits, ylim = limits)
 LAI_map <- ggplot() +
   geom_map(data = world, map = world,
     aes(long, lat, map_id = region),
     color = "black", fill = "white", size = 0.1) +
-  coord_cartesian(ylim = c(-30, 30)) +
+  coord_cartesian(ylim = c(-27.5, 27.5)) +
   geom_point(data = VIs_sites,
-    aes(x = Longitude, y = Latitude, color = jitter(change_annual_LAI_500m*100)),
-    alpha = 0.5, size = 4) +
+    aes(x = lon, y = lat, color = change_annual_LAI_500m*100),
+    size = 4, alpha = 0.95, position = "jitter") +
   labs(y = "Latitude", x = "Longitude", color = PLAI) +
   theme_bw() +
   theme(legend.position = "right",
@@ -83,18 +86,28 @@ LAI_map <- ggplot() +
         axis.text = element_text(size = 13, color = "Black"),
         legend.title = element_text(size = 13, color = "Black"),
         legend.text = element_text(size = 13, color = "Black")) +
-  scale_color_gradient2(midpoint=mid, low="red", mid="white",
-                        high="green")
+  scale_color_gradient2(midpoint = 0, low = "red", mid = "white",
+                        high = "blue") +
+  annotate("text", x = 148, y = -13,
+           label = c("Australia")) +
+  annotate("text", x = -105, y = 23.8,
+           label = c("Mexico")) +
+  annotate("text", x = -65, y = 14,
+           label = c("Puerto Rico")) +
+  annotate("text", x = 120, y = 27.5,
+           label = c("Central Taiwan")) +
+  annotate("text", x = 120, y = 18,
+           label = c("Southern Taiwan"))
 
 # EVI
 EVI_map <- ggplot() +
   geom_map(data = world, map = world,
            aes(long, lat, map_id = region),
            color = "black", fill = "white", size = 0.1) +
-  coord_cartesian(ylim = c(-30, 30)) +
+  coord_cartesian(ylim = c(-27.5, 27.5)) +
   geom_point(data = VIs_sites,
-             aes(x = Longitude, y = Latitude, color = change_annual_EVI_250m*100),
-             alpha = 0.5, size = 4) +
+             aes(x = lon, y = lat, color = jitter(change_annual_EVI_250m*100)),
+             size = 4, alpha = 0.7, position = "jitter") +
   labs(y = "Latitude", x = "Longitude", color = PEVI) +
   theme_bw() +
   theme(legend.position = "right",
@@ -105,8 +118,18 @@ EVI_map <- ggplot() +
         axis.text = element_text(size = 13, color = "Black"),
         legend.title = element_text(size = 13, color = "Black"),
         legend.text = element_text(size = 13, color = "Black")) +
-  scale_color_gradient2(midpoint=mid, low="red", mid="white",
-                        high="green", breaks = c(-60, 0, 20))
+  scale_color_gradient2(midpoint = 0, low = "red", mid = "white",
+                        high = "blue", breaks = c(-60, 0, 20)) +
+  annotate("text", x = 148, y = -13,
+           label = c("Australia")) +
+  annotate("text", x = -105, y = 23.8,
+           label = c("Mexico")) +
+  annotate("text", x = -65, y = 14,
+           label = c("Puerto Rico")) +
+  annotate("text", x = 120, y = 27.5,
+           label = c("Central Taiwan")) +
+  annotate("text", x = 120, y = 18,
+           label = c("Southern Taiwan"))
 
 # Join figures together and save
 map_LAI_EVI <- ggarrange(LAI_map, EVI_map, nrow = 2, ncol = 1, 
