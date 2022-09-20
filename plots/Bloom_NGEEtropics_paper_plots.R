@@ -391,51 +391,60 @@ ggsave("NGEE_paper_Fig_5.png", width = 6, height = 4,
 # LAI
 # selecting columns
 VI.PCA <- VIs_sites[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", 
-                       "Longitude", "gale.wind.duration..minutes.",
-                "peak_wind_speed_ms", "change_annual_total_litterfall", 
-                "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
-                "Parent_material", "MAT_MAP_ratio_X100",
-                "Cyclone_Rainfall_mm", "Region", "N")]
+                "Longitude", "Region")] #, "gale.wind.duration..minutes.",
+                # "peak_wind_speed_ms", "change_annual_total_litterfall",
+                # "Years_since_last_storm", "Elevation_m", "Cyclone_frequency",
+                # "Parent_material", "MAT_MAP_ratio_X100",
+                # "Cyclone_Rainfall_mm", "Region", "N")]
 
 # drop NAs
 VI.PCA <- VI.PCA %>%
   drop_na()
 
 # adds numeric factor column for parent material
-VI2 <- transform(VI.PCA, Parent_material_ID = as.numeric
-                 (factor(Parent_material)))
+#VI2 <- transform(VI.PCA, Parent_material_ID = as.numeric
+#                 (factor(Parent_material)))
 
 # select only numeric columns and remove parent materials
-VI2.PCA <- VI2[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", 
-                  "Longitude", "gale.wind.duration..minutes.",
-                  "peak_wind_speed_ms", "change_annual_total_litterfall",
-                  "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
-                  "Parent_material_ID", "MAT_MAP_ratio_X100",
-                  "Cyclone_Rainfall_mm")]
+VI2.PCA <- VI.PCA[,c("change_annual_LAI_500m", "Holdridge_ID", "soil_P", 
+                  "Longitude")] #, "gale.wind.duration..minutes.",
+                  # "peak_wind_speed_ms", "change_annual_total_litterfall",
+                  # "Years_since_last_storm", "Elevation_m", "Cyclone_frequency",
+                  # "Parent_material_ID", "MAT_MAP_ratio_X100",
+                  # "Cyclone_Rainfall_mm")]
 
 # rename columns
 VI2.PCA <- dplyr::rename(VI2.PCA, "change annual LAI (500m)" = 
                            change_annual_LAI_500m)
 VI2.PCA <- dplyr::rename(VI2.PCA, "Holdridge Life Zone" = Holdridge_ID)
 VI2.PCA <- dplyr::rename(VI2.PCA, "soil phosphorus" = soil_P)
-VI2.PCA <- dplyr::rename(VI2.PCA, "wind duration" = 
-                           gale.wind.duration..minutes.)
-VI2.PCA <- dplyr::rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
-VI2.PCA <- dplyr::rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
-VI2.PCA <- dplyr::rename(VI2.PCA, "years since last storm" = 
-                           Years_since_last_storm)
-VI2.PCA <- dplyr::rename(VI2.PCA, "elevation" = Elevation_m)
-VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
-VI2.PCA <- dplyr::rename(VI2.PCA, "parent material" = Parent_material_ID)
-VI2.PCA <- dplyr::rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
-VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "wind duration" =
+#                            gale.wind.duration..minutes.)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "years since last storm" =
+#                            Years_since_last_storm)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "elevation" = Elevation_m)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "parent material" = Parent_material_ID)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
 
 # compute PCA
 VI.pca <- prcomp(VI2.PCA, scale = TRUE)
 
-# include countries from VI2 in the order that they appear in the csv
+# compute eigenvalue for variable selection
+eigenvalue <- VI.pca$sdev ^ 2
+
+# select for eigenvalue > 1
+eigenvalue2 <- eigenvalue > 1
+#eigenvalue3 <- eigenvalue2 %>%
+#  as.numeric()
+#eigenvalue4 <- eigenvalue3 == 1
+
+# include countries from VI2 or VI.PCA in the order that they appear in the csv
 country <- c(rep("Caribbean", 2), rep("Mexico", 2), rep("Caribbean", 4), 
-             rep("Taiwan", 8), rep("Caribbean", 2), "Australia")
+             rep("Taiwan", 10), rep("Caribbean", 2), "Australia")
 print(country)
 
 # plot
@@ -452,55 +461,63 @@ LAI_PCA <- ggbiplot(VI.pca, ellipse = TRUE, obs.scale = 1, var.scale = 1,
         legend.position = "none",
         legend.text = element_text(size = 13, color = "black"),
         legend.title = element_text(size = 13, color = "black"))
+print(LAI_PCA)
+
 
 # EVI
 # selecting columns
 VI.PCA <- VIs_sites[,c("change_annual_EVI_250m", "Holdridge_ID", "soil_P", 
-                "Longitude", "gale.wind.duration..minutes.",
-                "peak_wind_speed_ms", "change_annual_total_litterfall", 
-                "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
-                "Parent_material", "MAT_MAP_ratio_X100",
-                "Cyclone_Rainfall_mm", "Region", "N")]
+                "Longitude", "Region")] #, "gale.wind.duration..minutes.",
+                # "peak_wind_speed_ms", "change_annual_total_litterfall", 
+                # "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
+                # "Parent_material", "MAT_MAP_ratio_X100",
+                # "Cyclone_Rainfall_mm", "Region", "N")]
 
 # drop NAs
 VI.PCA <- VI.PCA %>%
   drop_na()
 
 # adds numeric factor column for parent material
-VI2 <- transform(VI.PCA, Parent_material_ID = as.numeric
-                 (factor(Parent_material)))
+# VI2 <- transform(VI.PCA, Parent_material_ID = as.numeric
+#                  (factor(Parent_material)))
 
 # select only numeric columns and remove parent materials
-VI2.PCA <- VI2[,c("change_annual_EVI_250m", "Holdridge_ID", "soil_P", 
-                  "Longitude", "gale.wind.duration..minutes.",
-                  "peak_wind_speed_ms", "change_annual_total_litterfall",
-                  "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
-                  "Parent_material_ID", "MAT_MAP_ratio_X100",
-                  "Cyclone_Rainfall_mm")]
+VI2.PCA <- VI.PCA[,c("change_annual_EVI_250m", "Holdridge_ID", "soil_P", 
+                  "Longitude")] #, "gale.wind.duration..minutes.",
+                  # "peak_wind_speed_ms", "change_annual_total_litterfall",
+                  # "Years_since_last_storm", "Elevation_m", "Cyclone_frequency", 
+                  # "Parent_material_ID", "MAT_MAP_ratio_X100",
+                  # "Cyclone_Rainfall_mm")]
 
 # rename columns
 VI2.PCA <- dplyr::rename(VI2.PCA, "change annual EVI (250m)" = 
                            change_annual_EVI_250m)
 VI2.PCA <- dplyr::rename(VI2.PCA, "Holdridge Life Zone" = Holdridge_ID)
 VI2.PCA <- dplyr::rename(VI2.PCA, "soil phosphorus" = soil_P)
-VI2.PCA <- dplyr::rename(VI2.PCA, "wind duration" = 
-                           gale.wind.duration..minutes.)
-VI2.PCA <- dplyr::rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
-VI2.PCA <- dplyr::rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
-VI2.PCA <- dplyr::rename(VI2.PCA, "years since last storm" = 
-                           Years_since_last_storm)
-VI2.PCA <- dplyr::rename(VI2.PCA, "elevation" = Elevation_m)
-VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
-VI2.PCA <- dplyr::rename(VI2.PCA, "parent material" = Parent_material_ID)
-VI2.PCA <- dplyr::rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
-VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "wind duration" = 
+#                            gale.wind.duration..minutes.)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "wind speed" = peak_wind_speed_ms)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "change TL" = change_annual_total_litterfall)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "years since last storm" = 
+#                            Years_since_last_storm)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "elevation" = Elevation_m)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone frequency" = Cyclone_frequency)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "parent material" = Parent_material_ID)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "MAT:MAP ratio" = MAT_MAP_ratio_X100)
+# VI2.PCA <- dplyr::rename(VI2.PCA, "cyclone rainfall" = Cyclone_Rainfall_mm)
 
 # compute PCA
 VI.pca <- prcomp(VI2.PCA, scale = TRUE)
 
+# compute eigenvalue for variable selection
+eigenvalue <- VI.pca$sdev ^ 2
+
+# select for eigenvalue > 1
+eigenvalue2 <- eigenvalue > 1
+
 # include countries from VI2 in the order that they appear in the csv
 country <- c(rep("Caribbean", 2), rep("Mexico", 2), rep("Caribbean", 4), 
-             rep("Taiwan", 8), rep("Caribbean", 2), "Australia")
+             rep("Taiwan", 10), rep("Caribbean", 2), "Australia")
 print(country)
 
 # plot
@@ -517,12 +534,13 @@ EVI_PCA <- ggbiplot(VI.pca, ellipse = TRUE, obs.scale = 1, var.scale = 1,
         legend.position = "none",
         legend.text = element_text(size = 13, color = "black"),
         legend.title = element_text(size = 13, color = "black"))
+print(EVI_PCA)
 
 # Join figures together and save
 LAI_EVI_PCA <- ggarrange(LAI_PCA, EVI_PCA, ncol = 2, labels = c("A", "B"), 
                          common.legend = TRUE, legend="right")
 print(LAI_EVI_PCA)
-ggsave("NGEE_paper_Fig_6.png", width = 12, height = 10, 
+ggsave("NGEE_paper_Fig_6.png", width = 11, height = 9, 
        path = data_directory, dpi = 300, units = "in")
 
 

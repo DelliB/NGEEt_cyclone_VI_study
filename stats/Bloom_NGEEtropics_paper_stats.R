@@ -44,18 +44,41 @@ webshot("EVI_soilP_Reg.html", "EVI_soilP_Reg.png")
 
 ## Mixed effects
 # Fixed effects: LAI vs log transformed soil phosphorous
-# Mixed effects: Wind speed effects on 
-LAIsoilPWS <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
+# Mixed effects: Cyclone name
+LAIsoilPC <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|Cyclone_name), 
                    data = VIs_sites)
-summary(LAIsoilPWS)
-tab_model(LAIsoilPWS, file = "LAI_soilP_wind_ME.html")
-webshot("LAI_soilP_wind_ME.html", "LAI_soilP_wind_ME.png")
+summary(LAIsoilPC)
+tab_model(LAIsoilPC, file = "LAI_soilP_cyclone_ME.html")
+webshot("LAI_soilP_cyclone_ME.html", "LAI_soilP_cyclone_ME.png")
 
-# Wind speed effects on EVI vs log transformed soil phosphorous regression
-EVIsoilPWS <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
+# Site effects on LAI vs log transformed soil phosphorous regression
+#LAIsoilPS <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|Site), 
+#                   data = VIs_sites)
+#summary(LAIsoilPS)
+#tab_model(LAIsoilPS, file = "LAI_soilP_site_ME.html")
+#webshot("LAI_soilP_site_ME.html", "LAI_soilP_site_ME.png")
+
+# Determine best LAI mixed effects model using AIC
+# Lower AIC values indicate a better-fit model
+AIC(LAIsoilPC) # 19
+#AIC(LAIsoilPS) # 25
+
+
+# Cyclone name effects on EVI vs log transformed soil phosphorous regression
+#EVIsoilPC <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|Cyclone_name), 
+#                   data = VIs_sites)
+#summary(EVIsoilPC)
+#tab_model(EVIsoilPC, file = "EVI_soilP_cyclone_ME.html")
+#webshot("EVI_soilP_cyclone_ME.html", "EVI_soilP_cyclone_ME.png")
+
+# Site effects on EVI vs log transformed soil phosphorous regression
+EVIsoilPS <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|Site), 
                    data = VIs_sites)
-summary(EVIsoilPWS)
-tab_model(EVIsoilPWS, file = "EVI_soilP_wind_ME.html")
-webshot("EVI_soilP_wind_ME.html", "EVI_soilP_wind_ME.png")
+summary(EVIsoilPS)
+tab_model(EVIsoilPS, file = "EVI_soilP_site_ME.html")
+webshot("EVI_soilP_site_ME.html", "EVI_soilP_site_ME.png")
 
+# Determine best EVI mixed effects model using AIC
+#AIC(EVIsoilPC) # 17
+AIC(EVIsoilPS) # 14
 
