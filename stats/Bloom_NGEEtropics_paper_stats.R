@@ -26,30 +26,66 @@ VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"),
 
 ### Stats
 ## Regressions
-# LAI vs log transformed soil P
-LAIsoilP <- lm(change_annual_LAI_500m ~ log10(soil_P), data = VIs_sites)
+# annual LAI vs log transformed soil P
+aLAIsoilP <- lm(change_annual_LAI_500m ~ log10(soil_P), data = VIs_sites)
 # Print summary of regression in console
-summary(LAIsoilP)
+summary(aLAIsoilP)
 # Save regression output
-tab_model(LAIsoilP, file = "LAI_soilP_Reg.html")
+tab_model(aLAIsoilP, file = "aLAI_soilP_Reg.html")
 # Convert saved html to png
-webshot("LAI_soilP_Reg.html", "LAI_soilP_Reg.png")
+webshot("aLAI_soilP_Reg.html", "aLAI_soilP_Reg.png")
 
-# EVI vs log transformed soil P
-EVIsoilP <- lm(change_annual_EVI_250m ~ log10(soil_P), data = VIs_sites)
-summary(EVIsoilP)
-tab_model(EVIsoilP, file = "EVI_soilP_Reg.html")
-webshot("EVI_soilP_Reg.html", "EVI_soilP_Reg.png")
+# sub-annual LAI vs log transformed soil P
+saLAIsoilP <- lm(change_sub.annual_LAI_500m ~ log10(soil_P), data = VIs_sites)
+summary(saLAIsoilP)
+tab_model(saLAIsoilP, file = "saLAI_soilP_Reg.html")
+webshot("saLAI_soilP_Reg.html", "saLAI_soilP_Reg.png")
+
+# annual EVI vs log transformed soil P
+aEVIsoilP <- lm(change_annual_EVI_250m ~ log10(soil_P), data = VIs_sites)
+summary(aEVIsoilP)
+tab_model(aEVIsoilP, file = "aEVI_soilP_Reg.html")
+webshot("aEVI_soilP_Reg.html", "aEVI_soilP_Reg.png")
+
+# sub-annual EVI vs log transformed soil P
+saEVIsoilP <- lm(change_sub.annual_EVI_250m ~ log10(soil_P), data = VIs_sites)
+summary(saEVIsoilP)
+tab_model(saEVIsoilP, file = "saEVI_soilP_Reg.html")
+webshot("saEVI_soilP_Reg.html", "saEVI_soilP_Reg.png")
 
 
 ## Mixed effects
-# Fixed effects: LAI vs log transformed soil phosphorous
-# Mixed effects: Cyclone name
-LAIsoilPC <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|Cyclone_name), 
+# Fixed effects: annual LAI vs log transformed soil phosphorous
+# Mixed effects: Wind speed
+aLAIsoilPC <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
                    data = VIs_sites)
-summary(LAIsoilPC)
-tab_model(LAIsoilPC, file = "LAI_soilP_cyclone_ME.html")
-webshot("LAI_soilP_cyclone_ME.html", "LAI_soilP_cyclone_ME.png")
+summary(aLAIsoilPC)
+tab_model(aLAIsoilPC, file = "aLAI_soilP_cyclone_ME.html")
+webshot("aLAI_soilP_cyclone_ME.html", "aLAI_soilP_cyclone_ME.png")
+
+# Fixed effects: sub-annual LAI vs log transformed soil phosphorous
+# Mixed effects: Wind speed
+saLAIsoilPC <- lmer(change_sub.annual_LAI_500m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
+                  data = VIs_sites)
+summary(saLAIsoilPC)
+tab_model(saLAIsoilPC, file = "saLAI_soilP_cyclone_ME.html")
+webshot("saLAI_soilP_cyclone_ME.html", "saLAI_soilP_cyclone_ME.png")
+
+# Fixed effects: annual EVI vs log transformed soil phosphorous
+# Mixed effects: Wind speed
+aEVIsoilPC <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
+                  data = VIs_sites)
+summary(aEVIsoilPC)
+tab_model(aEVIsoilPC, file = "aEVI_soilP_cyclone_ME.html")
+webshot("aEVI_soilP_cyclone_ME.html", "aEVI_soilP_cyclone_ME.png")
+
+# Fixed effects: sub-annual EVI vs log transformed soil phosphorous
+# Mixed effects: Wind speed
+saEVIsoilPC <- lmer(change_sub.annual_EVI_250m ~ log10(soil_P) + (1|peak_wind_speed_ms), 
+                  data = VIs_sites)
+summary(saEVIsoilPC)
+tab_model(saEVIsoilPC, file = "saEVI_soilP_cyclone_ME.html")
+webshot("saEVI_soilP_cyclone_ME.html", "saEVI_soilP_cyclone_ME.png")
 
 # Site effects on LAI vs log transformed soil phosphorous regression
 #LAIsoilPS <- lmer(change_annual_LAI_500m ~ log10(soil_P) + (1|Site), 
@@ -62,21 +98,6 @@ webshot("LAI_soilP_cyclone_ME.html", "LAI_soilP_cyclone_ME.png")
 # Lower AIC values indicate a better-fit model
 AIC(LAIsoilPC) # 19
 #AIC(LAIsoilPS) # 25
-
-
-# Cyclone name effects on EVI vs log transformed soil phosphorous regression
-#EVIsoilPC <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|Cyclone_name), 
-#                   data = VIs_sites)
-#summary(EVIsoilPC)
-#tab_model(EVIsoilPC, file = "EVI_soilP_cyclone_ME.html")
-#webshot("EVI_soilP_cyclone_ME.html", "EVI_soilP_cyclone_ME.png")
-
-# Site effects on EVI vs log transformed soil phosphorous regression
-EVIsoilPS <- lmer(change_annual_EVI_250m ~ log10(soil_P) + (1|Site), 
-                   data = VIs_sites)
-summary(EVIsoilPS)
-tab_model(EVIsoilPS, file = "EVI_soilP_site_ME.html")
-webshot("EVI_soilP_site_ME.html", "EVI_soilP_site_ME.png")
 
 # Determine best EVI mixed effects model using AIC
 #AIC(EVIsoilPC) # 17

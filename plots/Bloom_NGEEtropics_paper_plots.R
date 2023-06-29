@@ -32,9 +32,6 @@ VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"),
 # Change in LAI and EVI
 EVI = expression(Delta*"EVI annual (250m)")
 LAI = expression(Delta*"LAI annual (500m)")
-# Percent change in LAI and EVI
-PEVI = expression(Delta*"EVI annual % (250m)")
-PLAI = expression(Delta*"LAI annual % (500m)")
 # Litter fall
 dTL1 = expression(Delta*"TL annual")
 dLL1 = expression(Delta*"LL annual")
@@ -57,85 +54,48 @@ VIs_sites$change_annual_total_litterfall = log(
 
 
 ### Plots
-## Figure 2: Maps of change in EVI and change in LAI
-# loading map
-world <- map_data("world")
-
-# plots
-# Adding jitter to map points to view all points
-VIs_sites$lat <- jitter(VIs_sites$Latitude, factor = 200)
-VIs_sites$lon <- jitter(VIs_sites$Longitude, factor = 200)
+## Figure 2: Point plot of change in EVI and change in LAI
+# Adding case study column with site and cyclone name
+VIs_sites_map <- VIs_sites %>%
+  mutate(case_study_names = paste(Site, "|", Cyclone_name))
 
 # LAI
-#LAI_data <- circleRepelLayout(VIs_sites, xlim = limits, ylim = limits)
-LAI_map <- ggplot() +
-  geom_map(data = world, map = world,
-    aes(long, lat, map_id = region),
-    color = "black", fill = "white", size = 0.1) +
-  coord_cartesian(ylim = c(-27.5, 27.5)) +
-  geom_point(data = VIs_sites,
-    aes(x = lon, y = lat, color = change_annual_LAI_500m*100),
-    size = 4, alpha = 0.95, position = "jitter") +
-  labs(y = "Latitude", x = "Longitude", color = PLAI) +
+LAI_cases <- ggplot(VIs_sites_map, aes(x = change_annual_LAI_500m, y = 
+                                    case_study_names, color = Site)) +
+  geom_point(size = 3) +
+  geom_vline(xintercept=c(0), color = "gray", linetype = "dashed") +
+  labs(y = "", x = LAI) +
   theme_bw() +
-  theme(legend.position = "right",
-        panel.background = element_blank(),
+  theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
+        legend.position = "none",
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
-        legend.title = element_text(size = 13, color = "Black"),
-        legend.text = element_text(size = 13, color = "Black")) +
-  scale_color_gradient2(midpoint = 0, low = "red", mid = "white",
-                        high = "blue") +
-  annotate("text", x = 148, y = -13,
-           label = c("Australia")) +
-  annotate("text", x = -105, y = 23.8,
-           label = c("Mexico")) +
-  annotate("text", x = -65, y = 14,
-           label = c("Puerto Rico")) +
-  annotate("text", x = 120, y = 27.5,
-           label = c("Central Taiwan")) +
-  annotate("text", x = 120, y = 18,
-           label = c("Southern Taiwan"))
+        panel.grid.minor = element_blank()) +
+  annotate("text", x = 0.25, y = 1,
+           label = c("Baseline"))
 
 # EVI
-EVI_map <- ggplot() +
-  geom_map(data = world, map = world,
-           aes(long, lat, map_id = region),
-           color = "black", fill = "white", size = 0.1) +
-  coord_cartesian(ylim = c(-27.5, 27.5)) +
-  geom_point(data = VIs_sites,
-             aes(x = lon, y = lat, color = jitter(change_annual_EVI_250m*100)),
-             size = 4, alpha = 0.7, position = "jitter") +
-  labs(y = "Latitude", x = "Longitude", color = PEVI) +
+EVI_cases <- ggplot(VIs_sites_map, aes(x = change_annual_EVI_250m, y = 
+                                         case_study_names, color = Site)) +
+  geom_point(size = 3) +
+  geom_vline(xintercept=c(0), color = "gray", linetype = "dashed") +
+  labs(y = "", x = EVI) +
   theme_bw() +
-  theme(legend.position = "right",
-        panel.background = element_blank(),
+  theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
+        legend.position = "none",
         axis.title = element_text(size = 13, color = "Black"),
         axis.text = element_text(size = 13, color = "Black"),
-        legend.title = element_text(size = 13, color = "Black"),
-        legend.text = element_text(size = 13, color = "Black")) +
-  scale_color_gradient2(midpoint = 0, low = "red", mid = "white",
-                        high = "blue", breaks = c(-60, 0, 20)) +
-  annotate("text", x = 148, y = -13,
-           label = c("Australia")) +
-  annotate("text", x = -105, y = 23.8,
-           label = c("Mexico")) +
-  annotate("text", x = -65, y = 14,
-           label = c("Puerto Rico")) +
-  annotate("text", x = 120, y = 27.5,
-           label = c("Central Taiwan")) +
-  annotate("text", x = 120, y = 18,
-           label = c("Southern Taiwan"))
+        panel.grid.minor = element_blank()) +
+  annotate("text", x = 0.2, y = 1,
+           label = c("Baseline"))
 
 # Join figures together and save
-map_LAI_EVI <- ggarrange(LAI_map, EVI_map, nrow = 2, ncol = 1, 
+Cases_LAI_EVI <- ggarrange(LAI_cases, EVI_cases, nrow = 1, ncol = 2, 
                         labels = c("A","B"))
-print(map_LAI_EVI)
-ggsave("NGEE_paper_Fig_2.png", width = 12, height = 6, 
+print(Cases_LAI_EVI)
+ggsave("NGEE_paper_Fig_2.png", width = 11, height = 6, 
        path = data_directory, dpi = 300, units = "in")
 
 
