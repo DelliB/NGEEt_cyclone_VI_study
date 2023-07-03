@@ -59,6 +59,7 @@ VIs_sites$change_annual_total_litterfall = log(
 VIs_sites_map <- VIs_sites %>%
   mutate(case_study_names = paste(Site, "|", Cyclone_name))
 
+## LAI and EVI separate
 # LAI
 LAI_cases <- ggplot(VIs_sites_map, aes(x = change_annual_LAI_500m, y = 
                                     case_study_names, color = Site)) +
@@ -96,6 +97,34 @@ Cases_LAI_EVI <- ggarrange(LAI_cases, EVI_cases, nrow = 1, ncol = 2,
                         labels = c("A","B"))
 print(Cases_LAI_EVI)
 ggsave("NGEE_paper_Fig_2.png", width = 11, height = 6, 
+       path = data_directory, dpi = 300, units = "in")
+
+## LAI and EVI together
+# Making column with both LAI and EVI
+VIs_sites_VIcombos <- VIs_sites_map %>%
+  pivot_longer(cols = c(change_annual_EVI_250m, change_annual_LAI_500m),
+               names_to = "VIs", values_to = "value")
+
+VIs_sites_VIcombos["VIs"][VIs_sites_VIcombos["VIs"] == "change_annual_EVI_250m"] <- "Change in EVI (250m)"
+VIs_sites_VIcombos["VIs"][VIs_sites_VIcombos["VIs"] == "change_annual_LAI_500m"] <- "Change in LAI (500m)"
+
+# Plot
+ggplot(VIs_sites_VIcombos, aes(x = value, y = case_study_names, color = VIs)) +
+  geom_point(size = 3) +
+  geom_vline(xintercept=c(0), color = "gray", linetype = "dashed") +
+  labs(y = "", x = LAI, color = "") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        legend.position = "top",
+        legend.text = element_text(size = 13, color = "Black"),
+        axis.title = element_text(size = 13, color = "Black"),
+        axis.text = element_text(size = 13, color = "Black"),
+        panel.grid.minor = element_blank()) +
+  annotate("text", x = 0.25, y = 1, label = c("Baseline"))
+
+# Save figure
+ggsave("NGEE_paper_Fig_2_v2.png", width = 8, height = 6, 
        path = data_directory, dpi = 300, units = "in")
 
 
