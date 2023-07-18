@@ -22,6 +22,10 @@ data_directory <- 'private/data'
 VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"), 
                       stringsAsFactors= FALSE, na.strings = '-9999') %>%
   drop_na(change_annual_LAI_500m)
+# recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), 
+#                      stringsAsFactors= FALSE, na.strings = '-9999')
+LFreco <- read.csv(file.path(data_directory, "MODIS_recovery_bb.csv"), 
+                   stringsAsFactors= FALSE, na.strings = '-9999')
 
 
 ### Stats
@@ -102,4 +106,25 @@ AIC(LAIsoilPC) # 19
 # Determine best EVI mixed effects model using AIC
 #AIC(EVIsoilPC) # 17
 AIC(EVIsoilPS) # 14
+
+
+## Variation in recovery times
+# Calculating recovery stats for EVI
+EVI_time_stats <- LFreco %>%
+  select(EVI_change_250m, month, case_study) %>%
+  filter(EVI_change_250m > 0) %>%
+  reframe(time_at_baseline = min(month), .by = case_study) %>%
+  reframe(EVI_month_lower = quantile(time_at_baseline, 0.05, na.rm = T),
+          EVI_month_upper = quantile(time_at_baseline, 0.95, na.rm = T),
+          EVI_month_m = mean(time_at_baseline, na.rm = T))
+
+# Calculating recovery stats for LAI
+LAI_time_stats <- LFreco %>%
+  select(LAI_change_500m, month, case_study) %>%
+  filter(LAI_change_500m > 0) %>%
+  reframe(time_at_baseline = min(month), .by = case_study) %>%
+  reframe(LAI_month_lower = quantile(time_at_baseline, 0.05, na.rm = T),
+          LAI_month_upper = quantile(time_at_baseline, 0.95, na.rm = T),
+          LAI_month_m = mean(time_at_baseline, na.rm = T))
+
 

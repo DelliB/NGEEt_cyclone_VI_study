@@ -22,7 +22,7 @@ data_directory <- 'private/data'
 recovery <- read.csv(file.path(data_directory, "MODIS_recovery.csv"), 
                      stringsAsFactors= FALSE, na.strings = '-9999')
 LFreco <- read.csv(file.path(data_directory, "MODIS_recovery_bb.csv"), 
-                   stringsAsFactors= FALSE)
+                   stringsAsFactors= FALSE, na.strings = '-9999')
 VIs_sites <- read.csv(file.path(data_directory, "case_study_data.csv"), 
                       stringsAsFactors= FALSE, na.strings = '-9999') %>%
   drop_na(change_annual_LAI_500m)
@@ -185,34 +185,29 @@ ggsave("NGEE_paper_Fig_3.png", width = 7, height = 6,
 
 
 ## Figure 4: Recovery of LAI and EVI
-# Inclusion of litter fall
-LFerror <- LFreco$Pantropical_Litterfall_Std_dev/
-  sqrt(LFreco$Number_Case_Studies)
-LFreco$min = LFreco$Pantropical_Litterfall_Mean - (1.96*LFerror)
-LFreco$max = LFreco$Pantropical_Litterfall_Mean + (1.96*LFerror)
+# Calculation of stats
+LF_CI <- LFreco %>%
+  #filter(LAI_change_500m != -9999) %>%
+  #filter(EVI_change_250m != -9999) %>%
+  reframe(EVI_lower = quantile(EVI_change_250m, 0.05, na.rm = T),
+         EVI_upper = quantile(EVI_change_250m, 0.95, na.rm = T),
+         LAI_lower = quantile(LAI_change_500m, 0.05, na.rm = T),
+         LAI_upper = quantile(LAI_change_500m, 0.95, na.rm = T),
+         LAI_m = mean(LAI_change_500m),
+         EVI_m = mean(EVI_change_250m),
+         .by = month)
 
-# LAI
-# 95% CI ribbon calculation
-LAIm <- recovery %>%
-  drop_na() %>%
-  group_by(month) %>%
-  summarize(m = mean(LAI_change_500m),
-            SD = sd(LAI_change_500m),
-            n = length(LAI_change_500m))
-LAIm <- merge(LAIm, recovery, by = "month")
-error <- LAIm$SD/sqrt(LAIm$n)
+# Inclusion of stats with litterfall data
+reco_CI <- merge(LF_CI, recovery, by = "month")
 
-# upper and lower ribbon bounds
-LAIm$min = LAIm$m - (1.96*error)
-LAIm$max = LAIm$m + (1.96*error)
-
-# plot
-LAIreco <- ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, color = region)) +
-  geom_line(data = LAIm[!is.na(LAIm$LAI_change_500m),], linetype = "dashed") +
-  geom_ribbon(aes(x = month, ymin = min, ymax = max), 
+# LAI plot
+LAIreco <- ggplot(reco_CI, aes(x = month, y = LAI_change_500m, group = case_study, color = region)) +
+  geom_line(data = reco_CI[!is.na(reco_CI$LAI_change_500m),], linetype = "dashed") +
+  geom_ribbon(aes(x = month, ymin = LAI_lower, ymax = LAI_upper), 
               fill = "light blue", alpha = 0.05, color = NA) +
-  geom_line(aes(x = month, y = m, color = "Pantropical Δ LAI"), lwd=1) +
-  geom_ribbon(data = LFreco, aes(x = month, ymin = CI_lower_bound, ymax = CI_upper_bound), 
+  geom_line(aes(x = month, y = LAI_m, color = "Pantropical Δ LAI"), lwd=1) +
+  geom_ribbon(data = LFreco, aes(x = month, ymin = CI_lower_bound, 
+                                 ymax = CI_upper_bound), 
               fill = "gray", alpha = 0.25, color = NA) +
   geom_line(data = LFreco, aes(x = month, y = Pantropical_Litterfall_Mean, 
                                color = "Pantropical litterfall"), lwd=1) +
@@ -242,28 +237,13 @@ LAIreco <- ggplot(LAIm, aes(x = month, y = LAI_change_500m, group = case_study, 
   #labs(caption = "Solid lines are pantropical mean and shaded areas represent 95% CI") +
   guides(color = guide_legend(ncol=4, byrow=FALSE))
 
-# EVI
-# 95% CI ribbon calculation
-EVIm <- recovery %>%
-  drop_na() %>%
-  group_by(month) %>%
-  summarize(m = mean(EVI_change_250m),
-            SD = sd(EVI_change_250m),
-            n = length(EVI_change_250m))
-EVIm <- merge(EVIm, recovery, by = "month")
-error <- EVIm$SD/sqrt(EVIm$n)
-
-# upper and lower ribbon bounds
-EVIm$min = EVIm$m - (1.96 * error)
-EVIm$max = EVIm$m + (1.96 * error)
-
-# plot
-EVIreco <- ggplot(EVIm, aes(x = month, y = EVI_change_250m, group = 
+# EVI plot
+EVIreco <- ggplot(reco_CI, aes(x = month, y = EVI_change_250m, group = 
                               case_study, color = region)) +
-  geom_line(data = EVIm[!is.na(EVIm$EVI_change_250m),], linetype = "dashed") +
-  geom_ribbon(aes(x = month, ymin = min, ymax = max), 
+  geom_line(data = reco_CI[!is.na(reco_CI$EVI_change_250m),], linetype = "dashed") +
+  geom_ribbon(aes(x = month, ymin = EVI_lower, ymax = EVI_upper), 
               fill = "purple1", alpha = 0.02, color = NA) +
-  geom_line(aes(x = month, y = m, color = "Pantropical Δ EVI"), lwd=1) +
+  geom_line(aes(x = month, y = EVI_m, color = "Pantropical Δ EVI"), lwd=1) +
   geom_ribbon(data = LFreco, aes(x = month, ymin = CI_lower_bound, ymax = 
                                    CI_upper_bound), 
               fill = "gray", alpha = 0.25, color = NA) +
